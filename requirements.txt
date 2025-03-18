@@ -1,0 +1,4 @@
+django==5
+djangorestframework==3.15.2
+requests==2.32.3
+debugpy==1.8.13
