@@ -14,4 +14,4 @@ PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
 
 ### TESTS
 cd backbase_test
- PYTHONPATH=$(pwd) python -m pytest --disable-warnings -v -s mycurrency/tests/test_*.py
+PYTHONPATH=$(pwd) python -m pytest --disable-warnings -v -s mycurrency/tests/test_*.py

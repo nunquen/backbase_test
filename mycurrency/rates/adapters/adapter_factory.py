@@ -14,25 +14,27 @@ dynamically at runtime.
 Functions:
     get_provider: Returns the current provider for fetching exchange rate data.
     get_exchange_rate_data: Fetches exchange rate data from the configured provider.
-    
+
 Constants:
     PROVIDER_MAPPING (dict): A dictionary mapping provider names to their respective adapter classes.
-    
+
 Classes:
     CurrencyBeaconAdapter (Class): Adapter class to interface with the CurrencyBeacon provider.
-    
+
 Example:
     provider_name = get_provider()
     exchange_data = get_exchange_rate_data("USD", "EUR", date(2021, 1, 1), date(2021, 12, 31))
-    
+
     This would use the current provider (e.g., "currencybeacon") to fetch exchange rate data.
 """
 from datetime import date
 from typing import Union
 from .currencybeacon_adapter import CurrencyBeaconAdapter
+from .currencymock_adapter import CurrencyMockAdapter
 
 PROVIDER_MAPPING = {
     "currencybeacon": CurrencyBeaconAdapter,
+    "currencymock": CurrencyMockAdapter
 }
 
 
@@ -47,7 +49,7 @@ def get_provider():
     Returns:
         str: The name of the provider (currently hardcoded as "currencybeacon").
     """
-    return "currencybeacon"
+    return "currencymock"
 
 
 def get_exchange_rate_data(

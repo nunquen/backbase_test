@@ -59,6 +59,7 @@
 - ASYNC
     - Implement an asynchronous method to load this historical data as quickly and efficiently as possible, minimizing resource consumption.
     - What do you think is a better option: concurrency or parallelism?
+    -> Approach: go month by month and retrieve each base currency in parallel
 
 - TEST
     - Provide a mechanism to ingest real-ish exchange rate data for testing purposes.
