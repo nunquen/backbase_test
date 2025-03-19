@@ -29,7 +29,7 @@ def get_exchange_rates(
     Returns:
         list: A dictionary grouped by valuation date containing exchange rates 
               for different currencies in the following structure:
-              
+
               {
                   "YYYY-MM-DD": {
                       "source_currency/exchanged_currency": rate_value,
@@ -46,7 +46,7 @@ def get_exchange_rates(
 
     # Removing source currency and getting the exchanged currencies
     exchanged_currencies = ",".join(valid_currencies - {source_currency})
-    
+
     # Checking if we have to retrieve remote data
     date_range = {date_from + timedelta(days=i) for i in range((date_to - date_from).days + 1)}
     db_date_range = set(
@@ -57,7 +57,7 @@ def get_exchange_rates(
     )
     # Identify missing dates
     missing_dates = date_range - db_date_range
-    
+
     # Case 1: we have all data in the database
     if not missing_dates:
         db_exchange_rates = get_exchange_rates_grouped_by_date_and_currency(
@@ -69,7 +69,7 @@ def get_exchange_rates(
 
     # Case 2: we have missing dates so let's see if there're any gaps
     sorted_missing_dates = sorted(missing_dates)
-    
+
     # Initialize variables to track subsets and gaps
     subsets = []
     current_subset = [sorted_missing_dates[0]]
@@ -84,7 +84,7 @@ def get_exchange_rates(
 
     # Add the last subset
     subsets.append(current_subset)
-    
+
     # Fetching remote data
     data = {}
     provider = ""
@@ -97,7 +97,7 @@ def get_exchange_rates(
         )
         data.update(new_data)
         provider = provider_name
-    
+
     # Saving data in data base
     for date_rate, currency_data in data.items():
         for currency, rate in currency_data.items():

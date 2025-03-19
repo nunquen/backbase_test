@@ -72,7 +72,7 @@ def get_exchange_rate_data(
     Returns:
         Union[dict, str]: A dictionary of exchange rate data retrieved from the provider and the provider name,
         or an error message if failed.
-        
+
     Raises:
         ValueError: If the provider is not supported.
         Exception: If there is an error in fetching the exchange rate data from the provider.
@@ -84,7 +84,6 @@ def get_exchange_rate_data(
         raise ValueError(f"Provider {provider_name} is not supported.")
 
     try:
-        #adapter = adapter_class()
         data = adapter_class.get_currency_rates_list(
             exchanged_currency=exchanged_currency,
             source_currency=source_currency,
