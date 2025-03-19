@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
 from .models import Currency
-from .adapters.serializers import CurrencyExchangeRateSerializer
+from .adapters.serializers import CurrencyExchangeRateSerializer, CurrencySerializer
 
 from .lib.utils import validate_date
 from .service.rater import get_exchange_rates
@@ -61,3 +61,9 @@ class CurrencyRateView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CurrencyViewSet(viewsets.ModelViewSet):
+    """CRUD API for Currency model"""
+    queryset = Currency.objects.all()
+    serializer_class = CurrencySerializer
