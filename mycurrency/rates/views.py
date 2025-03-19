@@ -56,8 +56,9 @@ class CurrencyRateView(APIView):
                 date_to=date_to_parsed
             )
 
-            serializer = CurrencyExchangeRateSerializer(rate_values, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            # serializer = CurrencyExchangeRateSerializer(rate_values, many=True)
+            
+            return Response(rate_values, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
