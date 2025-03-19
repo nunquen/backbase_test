@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # Django REST Framework
     'rest_framework',
     # Custom apps
-    'rates',
+    'mycurrency.rates',
 ]
 
 MIDDLEWARE = [

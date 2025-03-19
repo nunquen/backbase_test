@@ -4,7 +4,7 @@
         - EUR, CHF, USD and GBP
         - Have USD as base currency
 
-- Currency rates list
+✅ Currency rates list
     - Description: Service to retrieve a List of currency rates for a specific time period
     - Expected response: a time series list of rate values for each available Currency
     - Parameters:
@@ -38,7 +38,6 @@
             - Retrieve remote data 
             - store it in the data base
 
-
 - CRUD of currencies
     - apply crud for currencies
 
@@ -50,7 +49,9 @@
         - priority: only positive numbers - unique field
     
     - Logic:
-        - App will get the enabled provider with the lowest priority 
+        - App will get the enabled provider with the lowest priority
+    -> Improvement
+        - Link CurrencyExchangeRate with provider for future audit purpose (in case of discovering bad data)
 
 - ADMIN
     - Implement CONVERTER view: it could be possible to set a source currency and multiple target currencies.

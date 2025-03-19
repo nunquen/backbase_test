@@ -1,3 +1,9 @@
+"""
+This module provides services for retrieving exchange rates from the database 
+or fetching missing data from a remote provider when necessary.
+It ensures complete data coverage for a specified date range by detecting and 
+filling gaps in exchange rate records.
+"""
 from datetime import date, timedelta
 
 from ..models import Currency, CurrencyExchangeRate
@@ -10,6 +16,31 @@ def get_exchange_rates(
     date_from: date,
     date_to: date
 ) -> list:
+    """
+    Retrieves exchange rates for a given source currency and date range.
+    If all required data is available in the database, it is returned directly.
+    Otherwise, missing data is fetched from a remote provider and stored.
+
+    Args:
+        source_currency (str): The currency code for the source currency (e.g., 'USD', 'EUR').
+        date_from (date): The start date of the range for exchange rates.
+        date_to (date): The end date of the range for exchange rates.
+
+    Returns:
+        list: A dictionary grouped by valuation date containing exchange rates 
+              for different currencies in the following structure:
+              
+              {
+                  "YYYY-MM-DD": {
+                      "source_currency/exchanged_currency": rate_value,
+                      ...
+                  },
+                  ...
+              }
+
+    Raises:
+        ValueError: If an invalid currency code is provided.
+    """
 
     valid_currencies = set(Currency.objects.values_list("code", flat=True))
 
