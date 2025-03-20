@@ -64,5 +64,5 @@
     - Provide a mechanism to ingest real-ish exchange rate data for testing purposes.
     - Define tests
 
-- API Version
+✅ API Version
     - MyCurrency API could have different API versions or scopes 
