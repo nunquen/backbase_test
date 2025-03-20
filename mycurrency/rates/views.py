@@ -1,11 +1,17 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from .models import Currency
-from .adapters.serializers import CurrencyExchangeRateSerializer, CurrencySerializer
+from django.conf import settings
 
+import logging
+
+from .adapters.serializers import CurrencyExchangeRateSerializer, CurrencySerializer
 from .lib.utils import validate_date
+from .models import Currency
 from .service.rater import get_exchange_rates
+
+
+logger = logging.getLogger(__name__)
 
 
 class CurrencyRateView(APIView):
@@ -17,10 +23,11 @@ class CurrencyRateView(APIView):
         source_currency = request.GET.get("source_currency")
         date_from = request.GET.get("date_from")
         date_to = request.GET.get("date_to")
-        # valuation_date = request.GET.get(
-        #     "valuation_date",
-        #     datetime.today().strftime("%Y-%m-%d")
-        # )
+        logger.info("Currency Rates requested for {}, from {} to {}".format(
+            source_currency,
+            date_from,
+            date_to
+        ))
 
         # - retrieve all currencies and check if source_currency exists
         valid_currencies = set(Currency.objects.values_list("code", flat=True))
@@ -67,3 +74,11 @@ class CurrencyViewSet(viewsets.ModelViewSet):
     """CRUD API for Currency model"""
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
+
+
+class VersionView(APIView):
+    def get(self, request):
+        return Response(
+            {"version": settings.PROJECT_VERSION},
+            status=status.HTTP_200_OK
+        )

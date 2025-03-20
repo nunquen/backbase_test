@@ -9,12 +9,15 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import logging
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+with open(os.path.join(BASE_DIR, "VERSION")) as f:
+    PROJECT_VERSION = f.read().strip()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -127,3 +130,24 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CURRENCY_BEACON_API_KEY = "v8kpixcDpPwJKnyju6CeFknLGDDFDL56"
+
+
+class CustomLoggerAdapter(logging.LoggerAdapter):
+    def process(self, msg, kwargs):
+        extra = self.extra.copy()
+        extra.update(kwargs.get('extra', {}))
+        kwargs['extra'] = extra
+        return msg, kwargs
+
+
+logging.basicConfig(
+    filename='mycurrency/logs/myapp.log',
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# Apply to handlers
+# for handler in LOGGING.get("handlers", {}).values():
+#     if "formatter" in handler:
+#         handler["formatter"] = VersionedFormatter("%(asctime)s [%(levelname)s] [v%(version)s] %(message)s")

@@ -13,7 +13,6 @@
         - date_to
 
     - NOTES:
-        -  
         - Step1: look for stored time series between dates
         - Step2: if any date is missing, then fetch remotly data only for those missing days
             - symbols: have all currencies as a Set, remove the base and have the rest splitted by "," with no whit spaces.
@@ -38,7 +37,7 @@
             - Retrieve remote data 
             - store it in the data base
 
-- CRUD of currencies
+✅ CRUD of currencies
     - apply crud for currencies
 
 - PRIORITY
