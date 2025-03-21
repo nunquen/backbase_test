@@ -31,27 +31,35 @@ from datetime import date
 from typing import Union
 from .currencybeacon_adapter import CurrencyBeaconAdapter
 from .currencymock_adapter import CurrencyMockAdapter
+from rates.models import Provider
 from decimal import Decimal
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 PROVIDER_MAPPING = {
-    "currencybeacon": CurrencyBeaconAdapter,
-    "currencymock": CurrencyMockAdapter
+    "CurrencyBeacon": CurrencyBeaconAdapter,
+    "MockProvider": CurrencyMockAdapter
 }
 
 
 # TODO: have this from the database
-def get_provider():
+def get_provider() -> Provider:
     """
-    Retrieve the current provider for fetching exchange rate data.
+    Retrieve the relevant Provider for fetching exchange rate data.
 
-    For now, this function returns a hardcoded provider ("currencybeacon").
-    In the future, this can be dynamically fetched from a database or configuration.
+    The fetched Provider will be the enabled provider with the lowest priority.
 
     Returns:
-        str: The name of the provider (currently hardcoded as "currencybeacon").
+        Provider: provider database object.
     """
-    return "currencymock"
+    provider = Provider.objects.filter(is_enabled=True).order_by("priority").first()
+    if provider:
+        logger.info(f"Provider {provider.name} has been selected")
+    else:
+        logger.warning("No Provider has been selected")
+    return provider
 
 
 def get_exchange_rate_data(
@@ -81,20 +89,27 @@ def get_exchange_rate_data(
         ValueError: If the provider is not supported.
         Exception: If there is an error in fetching the exchange rate data from the provider.
     """
-    provider_name = get_provider()
-    adapter_class = PROVIDER_MAPPING.get(provider_name)
+    provider = get_provider()
+    if not provider:
+        raise ValueError("No available providers.")
+
+    adapter_class = PROVIDER_MAPPING.get(provider.name)
 
     if not adapter_class:
-        raise ValueError(f"Provider {provider_name} is not supported.")
+        logger.error(f"Provider {provider.name} is not supported.")
+        raise ValueError(f"Provider {provider.name} is not supported.")
 
     try:
-        data = adapter_class.get_exchange_rate_data(
+        # Instantiate the adapter class with the provider's key
+        adapter_instance = adapter_class(api_key=provider.key)
+
+        data = adapter_instance.get_exchange_rate_data(
             exchanged_currency=exchanged_currency,
             source_currency=source_currency,
             date_from=date_from,
             date_to=date_to
         )
-        return data, provider_name
+        return data, provider.name
     except Exception as e:
         raise e
 
@@ -104,18 +119,22 @@ def get_exchange_convertion_data(
     exchanged_currency: str,
     amount: Decimal
 ) -> dict:
-    provider_name = get_provider()
-    adapter_class = PROVIDER_MAPPING.get(provider_name)
+    provider = get_provider()
+    adapter_class = PROVIDER_MAPPING.get(provider.name)
 
     if not adapter_class:
-        raise ValueError(f"Provider {provider_name} is not supported.")
+        logger.error(f"Provider {provider.name} is not supported.")
+        raise ValueError(f"Provider {provider.name} is not supported.")
 
     try:
-        data = adapter_class.get_exchange_convertion_data(
+        # Instantiate the adapter class with the provider's key
+        adapter_instance = adapter_class(api_key=provider.key)
+
+        data = adapter_instance.get_exchange_convertion_data(
             source_currency=source_currency,
             exchanged_currency=exchanged_currency,
             amount=amount
         )
-        return data, provider_name
+        return data, provider.name
     except Exception as e:
         raise e

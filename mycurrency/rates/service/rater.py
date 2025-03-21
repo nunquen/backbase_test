@@ -87,20 +87,22 @@ def get_exchange_rates(
 
     # Fetching remote data
     data = {}
-    provider = ""
+    provider = None
     for gap in subsets:
-        new_data, provider_name = get_exchange_rate_data(
+        new_data, provider = get_exchange_rate_data(
             source_currency=source_currency,
             exchanged_currency=exchanged_currencies,
             date_from=gap[0],
             date_to=gap[-1]
         )
         data.update(new_data)
-        provider = provider_name
 
     # Saving data in data base
     for date_rate, currency_data in data.items():
         for currency, rate in currency_data.items():
+            if rate is None:
+                continue
+
             source_currency_obj = Currency.objects.get(code=source_currency)
             exchanged_obj = Currency.objects.get(code=currency)
 

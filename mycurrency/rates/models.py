@@ -34,3 +34,20 @@ class CurrencyExchangeRate(models.Model):
 
     def __str__(self):
         return f"{self.source_currency.code} to {self.exchanged_currency.code} on {self.valuation_date}"
+
+
+class Provider(models.Model):
+    """
+    Model representing an exchange rate provider.
+    """
+
+    name = models.CharField(max_length=255, unique=True, help_text="Unique name of the provider.")
+    key = models.CharField(max_length=255, help_text="API key or identifier for the provider.")
+    is_enabled = models.BooleanField(default=True, help_text="Indicates if the provider is active.")
+    priority = models.PositiveIntegerField(unique=True, help_text="Priority order for provider selection.")
+
+    class Meta:
+        ordering = ["priority"]
+
+    def __str__(self):
+        return self.name

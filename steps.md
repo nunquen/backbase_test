@@ -40,7 +40,7 @@
 ✅ CRUD of currencies
     - apply crud for currencies
 
-- PRIORITY
+✅ PRIORITY
     - create a new provider entity that will hold
         - Provider name - unique field
         - provider key

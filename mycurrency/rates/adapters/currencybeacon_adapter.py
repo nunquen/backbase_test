@@ -9,13 +9,17 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
     """
     Adapter to fetch exchange rates from CurrencyBeacon.
 
-    This adapter interacts with the CurrencyBeacon API to retrieve historical 
+    This adapter interacts with the CurrencyBeacon API to retrieve historical
     exchange rate data and perform currency conversions.
     """
 
     BASE_URL = "https://api.currencybeacon.com/v1"
 
+    def __init__(self, api_key: str):
+        super().__init__(api_key)
+
     def get_exchange_rate_data(
+        self,
         source_currency: str,
         exchanged_currency: str,
         date_from: date,
@@ -38,7 +42,7 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
         """
         headers = {
             "Authorization": "Bearer {}".format(
-                settings.CURRENCY_BEACON_API_KEY
+                self.api_key
             )
         }
         params = {
@@ -61,6 +65,7 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
             raise ValueError("Time Series rates not found")
 
     def get_exchange_convertion_data(
+        self,
         source_currency: str,
         exchanged_currency: str,
         amount: Decimal
@@ -87,7 +92,7 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
         """
         headers = {
             "Authorization": "Bearer {}".format(
-                settings.CURRENCY_BEACON_API_KEY
+                self.api_key
             )
         }
         params = {

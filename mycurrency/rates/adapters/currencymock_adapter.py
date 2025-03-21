@@ -10,7 +10,11 @@ class CurrencyMockAdapter(BaseExchangeRateAdapter):
     for a given date range or currency conversion.
     """
 
+    def __init__(self, api_key: str):
+        super().__init__(api_key)
+
     def get_exchange_rate_data(
+        self,
         source_currency: str,
         exchanged_currency: str,
         date_from: date,
@@ -48,6 +52,7 @@ class CurrencyMockAdapter(BaseExchangeRateAdapter):
             raise ValueError("Time Series rates not found")
 
     def get_exchange_convertion_data(
+        self,
         source_currency: str,
         exchanged_currency: str,
         amount: Decimal

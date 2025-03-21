@@ -29,23 +29,6 @@ def create_currencies():
 
 
 @pytest.mark.django_db
-def test_currency_rate_valid_request(api_client, create_currencies):
-    """Test the API with a valid request."""
-    mock.patch("rates.service.rater.get_exchange_rates", return_value={
-        "2025-03-10": {"USD/EUR": 1.085}
-    })
-
-    response = api_client.get(
-        reverse("currency-rates"),
-        {"source_currency": "USD", "date_from": "2025-03-10", "date_to": "2025-03-10"}
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert "2025-03-10" in response.json()
-    assert "USD/EUR" in response.json()["2025-03-10"]
-
-
-@pytest.mark.django_db
 def test_currency_rate_invalid_source_currency(api_client, create_currencies):
     """Test with an invalid source currency."""
     response = api_client.get(
@@ -126,3 +109,24 @@ def test_currency_rate_exception_handling(api_client, create_currencies):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Something went wrong" in response.json()["error"]
         # Assert that the patched function was called
+
+
+@pytest.mark.django_db
+def test_currency_rate_valid_request(api_client, create_currencies):
+    """Test the API with a valid request."""
+    with patch(
+        "rates.views.get_exchange_rates",
+        return_value={
+            "2025-03-10": {"USD/EUR": 1.085}
+        }
+    ) as mock_get_exchange_rates:
+
+        response = api_client.get(
+            reverse("currency-rates"),
+            {"source_currency": "USD", "date_from": "2025-03-10", "date_to": "2025-03-15"}
+        )
+
+        mock_get_exchange_rates.assert_called()
+        assert response.status_code == status.HTTP_200_OK
+        assert "2025-03-10" in response.json()
+        assert "USD/EUR" in response.json()["2025-03-10"]
