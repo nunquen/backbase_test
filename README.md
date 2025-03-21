@@ -24,19 +24,29 @@ PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
 #### TEST THE ENDPOINTS
 You can use rates/postman_collections/JOBS_BackBase.postman_collection.json and import them using Postman
 
-- CURRENCY RATES [GET]: /api/v1/currency-rates/?source_currency=USD&date_from=2025-01-06&date_to=2025-01-25
-
-- CURRENCY CONVERTER [GET]: /api/v1/currency-converter/?source_currency=USD&exchanged_currency=GBP&amount=1
-
-- Currency CRUD:
+- CURRENCY RATES
 ```
-Method      Endpoint            Description
-GET         /currency/          List all currencies
-POST        /currency/          Create a new currency
-GET         /currency/{id}/     Retrieve a specific currency
-PUT         /currency/{id}/     Update a currency
-PATCH       /currency/{id}/     Partially update a currency
-DELETE      /currency/{id}/     Delete a currency
+Method      Endpoint                        Example
+GET         /api/v1/currency-rates/         http://127.0.0.1:8000/api/v1/currency-rates/?source_currency=USD&date_from=2025-01-01&date_to=2025-01-10
+```
+
+- CURRENCY CONVERTER [GET]: 
+```
+Method      Endpoint                        Example
+GET         /api/v1/currency-converter/     http://127.0.0.1:8000/api/v1/currency-converter/?source_currency=USD&exchanged_currency=GBP&amount=1
+```
+
+- CURRENCY CRUD:
+```
+Method      Endpoint                Description
+GET         /api/currency-rates/        Retrieve a time serie convertion rate based on date range 
+GET         /api/currency-converter/    Convert a courrency amount
+GET         /api/currency/              List all currencies
+POST        /api/currency/              Create a new currency
+GET         /api/currency/{id}/         Retrieve a specific currency
+PUT         /api/currency/{id}/         Update a currency
+PATCH       /api/currency/{id}/         Partially update a currency
+DELETE      /api/currency/{id}/         Delete a currency
 ````
 
 - API Version
