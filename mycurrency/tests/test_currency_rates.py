@@ -113,14 +113,16 @@ def test_currency_rate_invalid_date_format(
 def test_currency_rate_exception_handling(api_client, create_currencies):
     """Test unexpected exception handling."""
     with patch(
-        "rates.service.rater.get_exchange_rates",
+        "rates.views.get_exchange_rates",
         side_effect=Exception("Something went wrong")
-    ):
+    ) as mock_get_exchange_rates:
 
         response = api_client.get(
             reverse("currency-rates"),
             {"source_currency": "USD", "date_from": "2025-03-10", "date_to": "2025-03-15"}
         )
 
+        mock_get_exchange_rates.assert_called()
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Something went wrong" in response.json()["error"]
+        # Assert that the patched function was called

@@ -31,6 +31,8 @@ from datetime import date
 from typing import Union
 from .currencybeacon_adapter import CurrencyBeaconAdapter
 from .currencymock_adapter import CurrencyMockAdapter
+from decimal import Decimal
+
 
 PROVIDER_MAPPING = {
     "currencybeacon": CurrencyBeaconAdapter,
@@ -86,11 +88,33 @@ def get_exchange_rate_data(
         raise ValueError(f"Provider {provider_name} is not supported.")
 
     try:
-        data = adapter_class.get_currency_rates_list(
+        data = adapter_class.get_exchange_rate_data(
             exchanged_currency=exchanged_currency,
             source_currency=source_currency,
             date_from=date_from,
             date_to=date_to
+        )
+        return data, provider_name
+    except Exception as e:
+        raise e
+
+
+def get_exchange_convertion_data(
+    source_currency: str,
+    exchanged_currency: str,
+    amount: Decimal
+) -> dict:
+    provider_name = get_provider()
+    adapter_class = PROVIDER_MAPPING.get(provider_name)
+
+    if not adapter_class:
+        raise ValueError(f"Provider {provider_name} is not supported.")
+
+    try:
+        data = adapter_class.get_exchange_convertion_data(
+            source_currency=source_currency,
+            exchanged_currency=exchanged_currency,
+            amount=amount
         )
         return data, provider_name
     except Exception as e:

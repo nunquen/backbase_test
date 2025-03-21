@@ -4,10 +4,10 @@ or fetching missing data from a remote provider when necessary.
 It ensures complete data coverage for a specified date range by detecting and 
 filling gaps in exchange rate records.
 """
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from ..models import Currency, CurrencyExchangeRate
-from ..adapters.adapter_factory import get_exchange_rate_data
+from ..adapters.adapter_factory import get_exchange_rate_data, get_exchange_convertion_data
 from ..domain.db import get_exchange_rates_grouped_by_date_and_currency
 
 
@@ -118,3 +118,48 @@ def get_exchange_rates(
             date_to=date_to
         )
     return db_exchange_rates
+
+
+def get_exchange_convertion(
+    source_currency: str,
+    exchanged_currency: str,
+    amount: float
+) -> dict:
+    current_date = datetime.now().date()
+    # Checking if we have to retrieve remote data
+    db_rate = CurrencyExchangeRate.objects.filter(
+            source_currency__code=source_currency,
+            exchanged_currency__code=exchanged_currency,
+            valuation_date=current_date
+        ).first()
+
+    if db_rate:
+        data = {
+            "date": db_rate.valuation_date.strftime("%Y-%m-%d"),
+            "from": db_rate.source_currency.code,
+            "to": db_rate.exchanged_currency.code,
+            "amount": amount,
+            "value": amount * db_rate.rate_value
+        }
+        return data
+
+    # We need to retrieve remote data
+    data, provider_name = get_exchange_convertion_data(
+        source_currency=source_currency,
+        exchanged_currency=exchanged_currency,
+        amount=amount
+    )
+
+    # Saving new rate value in data base
+    new_rate_value = data["value"] / float(amount)
+    source_currency_obj = Currency.objects.get(code=source_currency)
+    exchanged_obj = Currency.objects.get(code=exchanged_currency)
+
+    CurrencyExchangeRate.objects.get_or_create(
+        source_currency=source_currency_obj,
+        exchanged_currency=exchanged_obj,
+        valuation_date=current_date,
+        defaults={"rate_value": new_rate_value},
+    )
+
+    return data

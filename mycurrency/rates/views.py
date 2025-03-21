@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import serializers, status, viewsets
 from django.conf import settings
 
 import logging
@@ -8,10 +8,75 @@ import logging
 from .adapters.serializers import CurrencyExchangeRateSerializer, CurrencySerializer
 from .lib.utils import validate_date
 from .models import Currency
-from .service.rater import get_exchange_rates
+from .service.rater import get_exchange_rates, get_exchange_convertion
 
 
 logger = logging.getLogger(__name__)
+
+
+class CurrencyConversionQuerySerializer(serializers.Serializer):
+    source_currency = serializers.CharField(required=True, max_length=3)
+    exchanged_currency = serializers.CharField(required=True, max_length=3)
+    amount = serializers.DecimalField(
+        required=True,
+        max_digits=12,
+        decimal_places=2,
+        min_value=0.01
+    )
+
+
+class CurrencyConverterView(APIView):
+    """
+    API View to retrieve real time currency convertion for an specific amount.
+    """
+
+    def get(self, request):
+        data = request.query_params.copy()
+        if "amount" in data:
+            try:
+                data["amount"] = float(data["amount"])
+            except Exception:
+                data["amount"] = ""
+
+        serializer = CurrencyConversionQuerySerializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated_data = serializer.validated_data
+        source_currency = validated_data['source_currency']
+        exchanged_currency = validated_data['exchanged_currency']
+        amount = validated_data['amount']
+
+        logger.info("Currency Convertion requested for {}, from {} to {}".format(
+            source_currency,
+            exchanged_currency,
+            amount
+        ))
+
+        # - retrieve all currencies and check if source_currency exists
+        valid_currencies = set(Currency.objects.values_list("code", flat=True))
+        if source_currency not in valid_currencies:
+            return Response(
+                {"error": f"Invalid source_currency: {source_currency}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if exchanged_currency not in valid_currencies:
+            return Response(
+                {"error": f"Invalid exchanged_currency: {exchanged_currency}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            convertion_rate = get_exchange_convertion(
+                source_currency=source_currency,
+                exchanged_currency=exchanged_currency,
+                amount=amount
+            )
+            return Response(convertion_rate, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CurrencyRateView(APIView):

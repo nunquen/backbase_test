@@ -19,7 +19,7 @@
         - Step3: save new items if any
         - Step4: retrieve requested items
 
-- Convert amount
+✅ Convert amount
     - Description: Service that calculates (latest) amount in a currency exchanged into a different currency (currency converter)
     - Expected response: An object containing at least the rate value between source and exchange currencies.
     - Parameters:

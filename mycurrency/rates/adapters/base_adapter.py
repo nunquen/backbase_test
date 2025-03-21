@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
+from decimal import Decimal
 
 
 class BaseExchangeRateAdapter(ABC):
@@ -17,4 +18,13 @@ class BaseExchangeRateAdapter(ABC):
         """
         Fetch exchange rates from the provider.
         """
-        pass
+
+    @abstractmethod
+    def get_exchange_convertion_data(
+        source_currency: str,
+        exchanged_currency: str,
+        amount: Decimal
+    ) -> dict:
+        """
+        Fetch exchange convertion from the provider.
+        """

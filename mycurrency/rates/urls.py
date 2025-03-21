@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CurrencyRateView, CurrencyViewSet, VersionView
+from .views import CurrencyRateView, CurrencyViewSet, VersionView, CurrencyConverterView
 
 router = DefaultRouter()
 router.register(r'currency', CurrencyViewSet, basename="currency")
@@ -12,6 +12,11 @@ urlpatterns = [
         f'{version}/currency-rates/',
         CurrencyRateView.as_view(),
         name='currency-rates'
+    ),
+    path(
+        f'{version}/currency-converter/',
+        CurrencyConverterView.as_view(),
+        name='currency-converter'
     ),
     path("", include(router.urls)),
     path("version/", VersionView.as_view(), name="version"),
