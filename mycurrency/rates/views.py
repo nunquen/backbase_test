@@ -9,7 +9,7 @@ from .adapters.serializers import CurrencyExchangeRateSerializer, CurrencySerial
 from .lib.utils import validate_date
 from .models import Currency
 from .service.rater import get_exchange_rates, get_exchange_convertion
-
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class CurrencyConversionQuerySerializer(serializers.Serializer):
         required=True,
         max_digits=12,
         decimal_places=2,
-        min_value=0.01
+        min_value=Decimal("0.01")
     )
 
 
@@ -117,11 +117,6 @@ class CurrencyRateView(APIView):
             )
 
         try:
-            # valuation_date = datetime.strptime(
-            #     valuation_date,
-            #     "%Y-%m-%d"
-            # ).date()
-
             rate_values = get_exchange_rates(
                 source_currency=source_currency,
                 date_from=date_from_parsed,

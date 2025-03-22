@@ -138,8 +138,8 @@ def get_exchange_convertion(
     if db_rate:
         data = {
             "date": db_rate.valuation_date.strftime("%Y-%m-%d"),
-            "from": db_rate.source_currency.code,
-            "to": db_rate.exchanged_currency.code,
+            "source_currency": db_rate.source_currency.code,
+            "exchanged_currency": db_rate.exchanged_currency.code,
             "amount": amount,
             "value": amount * db_rate.rate_value
         }
@@ -151,6 +151,7 @@ def get_exchange_convertion(
         exchanged_currency=exchanged_currency,
         amount=amount
     )
+    data.pop("timestamp", None)  # Not showing timestamp
 
     # Saving new rate value in data base
     new_rate_value = data["value"] / float(amount)
