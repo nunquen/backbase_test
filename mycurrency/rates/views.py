@@ -1,7 +1,8 @@
-from rest_framework.views import APIView
+from adrf.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers, status, viewsets
 from django.conf import settings
+
 
 import logging
 
@@ -9,7 +10,10 @@ from .adapters.serializers import CurrencyExchangeRateSerializer, CurrencySerial
 from .lib.utils import validate_date
 from .models import Currency
 from .service.rater import get_exchange_rates, get_exchange_convertion
+from .service.batch_processor import batch_process
 from decimal import Decimal
+from uuid import uuid4
+
 
 logger = logging.getLogger(__name__)
 
@@ -140,5 +144,64 @@ class VersionView(APIView):
     def get(self, request):
         return Response(
             {"version": settings.PROJECT_VERSION},
+            status=status.HTTP_200_OK
+        )
+
+
+class CurrencyHistoryRateView(APIView):
+    """
+    API View to asynchronously retrieve currency rates for a particular time range.
+    """
+
+    async def post(self, request):
+        date_from = request.data.get("date_from")
+        date_to = request.data.get("date_to")
+        logger.info("Currency History Rates requested from {} to {}".format(
+            date_from,
+            date_to
+        ))
+        # - check dates format to be "%Y-%m-%d"
+        date_from_parsed, error_response = validate_date(date_str=date_from, field_name="date_from")
+        if error_response:
+            return error_response
+
+        date_to_parsed, error_response = validate_date(date_str=date_to, field_name="date_to")
+        if error_response:
+            return error_response
+
+        if date_from_parsed > date_to_parsed:
+            return Response(
+                {"error": "Invalid date range"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        process_id = await batch_process(
+            date_from=date_from_parsed,
+            date_to=date_to_parsed
+        )
+        response_body = {
+            "process_id": str(process_id),
+
+        }
+        return Response(
+            response_body,
+            status=status.HTTP_200_OK
+        )
+
+    async def get(self, request):
+        history_process_id = request.GET.get("process_id")
+        logger.info("Currency History Ratesp status requested for process ID {}".format(
+            history_process_id
+        ))
+        # Validate process_id
+
+        response_body = {
+            "process_id": history_process_id,
+            "status": "Processing",
+            "date_from": "2024-01-01",
+            "date_to": "2024-12-31"
+        }
+
+        return Response(
+            response_body,
             status=status.HTTP_200_OK
         )
