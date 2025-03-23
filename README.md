@@ -21,6 +21,12 @@ PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
 - Open http://127.0.0.1:8000/admin/ in a browser and connect using the admin user previously created
 - Update CurrencyBacon provider: Home > Providers > CurrencyBacon
 
+#### MANAGE PROVIDERS
+```
+You can enable/disable and change provider's priority here:
+http://127.0.0.1:8000/admin/rates/provider/
+```
+
 #### TEST THE ENDPOINTS
 You can use rates/postman_collections/JOBS_BackBase.postman_collection.json and import them using Postman
 
@@ -74,13 +80,7 @@ GET         /api/version/       Shows current API version
 ```
 
 ### RUN TESTS
+```
 cd backbase_test
 PYTHONPATH=$(pwd) python -m pytest --disable-warnings -v -s mycurrency/tests/test_*.py
-
-
-
-
-PYTHONPATH=$(pwd) python mycurrency/manage.py makemigrations
-PYTHONPATH=$(pwd) python mycurrency/manage.py migrate
-PYTHONPATH=$(pwd) python mycurrency/manage.py createsuperuser
-PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
+```
