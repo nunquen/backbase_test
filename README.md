@@ -30,10 +30,28 @@ Method      Endpoint                        Example
 GET         /api/v1/currency-rates/         http://127.0.0.1:8000/api/v1/currency-rates/?source_currency=USD&date_from=2025-01-01&date_to=2025-01-10
 ```
 
-- CURRENCY CONVERTER [GET]: 
+- CURRENCY CONVERTER: 
 ```
 Method      Endpoint                        Example
 GET         /api/v1/currency-converter/     http://127.0.0.1:8000/api/v1/currency-converter/?source_currency=USD&exchanged_currency=GBP&amount=1
+```
+
+- FETCHING MASSIVE HISTORY RATES
+```
+Method      Endpoint                        Example
+POST        /api/v1/currency-history-rates/ http://127.0.0.1:8000/api/v1/currency-history-rates
+                                            Body:
+                                            {
+                                                "source_currency": "USD",
+                                                "date_from": "2000-01-01",
+                                                "date_to": "2025-03-15"
+                                            }
+                                            Response:
+                                            {
+                                                "process_id": "6f13c39a-3584-4f30-b1b5-4ae41e7bfd31"
+                                            }
+You can follow the batch process here:
+http://127.0.0.1:8000/admin/rates/batchprocess/
 ```
 
 - CURRENCY CRUD:
