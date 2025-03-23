@@ -42,7 +42,7 @@ Method      Endpoint                        Example
 GET         /api/v1/currency-converter/     http://127.0.0.1:8000/api/v1/currency-converter/?source_currency=USD&exchanged_currency=GBP&amount=1
 ```
 
-- FETCHING MASSIVE HISTORY RATES
+- FETCHING MASSIVE HISTORY RATES (concurrency way)
 ```
 Method      Endpoint                        Example
 POST        /api/v1/currency-history-rates/ http://127.0.0.1:8000/api/v1/currency-history-rates
@@ -58,6 +58,11 @@ POST        /api/v1/currency-history-rates/ http://127.0.0.1:8000/api/v1/currenc
                                             }
 You can follow the batch process here:
 http://127.0.0.1:8000/admin/rates/batchprocess/
+
+Note:
+- Parallelism is discarted when fetching massive data to avoid being banned from remote API providers
+- Smart fetching: only missing rates from data base will be request from data provider
+- A minor 0.2 second delay is add to each request
 ```
 
 - CURRENCY CRUD:
