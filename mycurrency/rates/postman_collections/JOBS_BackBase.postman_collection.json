@@ -238,7 +238,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/v1/currency-rates/?source_currency=USD&date_from=2025-01-05&date_to=2025-01-10",
+					"raw": "http://127.0.0.1:8000/api/v1/currency-rates/?source_currency=USD&date_from=2024-03-01&date_to=2024-03-03",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -260,11 +260,11 @@
 						},
 						{
 							"key": "date_from",
-							"value": "2025-01-05"
+							"value": "2024-03-01"
 						},
 						{
 							"key": "date_to",
-							"value": "2025-01-10"
+							"value": "2024-03-03"
 						}
 					]
 				}
@@ -352,6 +352,86 @@
 			"response": []
 		},
 		{
+			"name": "MyCurrency History Rates POST",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "v8kpixcDpPwJKnyju6CeFknLGDDFDL56",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "from",
+						"value": "EUR",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "to",
+						"value": "USD",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "amount",
+						"value": "100.0",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"source_currency\": \"USD\",\n    \"date_from\": \"2024-11-29\",\n    \"date_to\": \"2024-12-19\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/v1/currency-history-rates/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"v1",
+						"currency-history-rates",
+						""
+					],
+					"query": [
+						{
+							"key": "source_currency",
+							"value": "USD",
+							"disabled": true
+						},
+						{
+							"key": "exchanged_currency",
+							"value": "GBP",
+							"disabled": true
+						},
+						{
+							"key": "amount",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "CurrencyBeacon time series",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -398,7 +478,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://api.currencybeacon.com/v1/timeseries?base=EUR&start_date=2025-03-01&end_date=2025-03-19&symbols=USD,GBP",
+					"raw": "https://api.currencybeacon.com/v1/timeseries?base=EUR&start_date=2024-12-01&end_date=2024-12-15&symbols=USD,GBP",
 					"protocol": "https",
 					"host": [
 						"api",
@@ -416,11 +496,11 @@
 						},
 						{
 							"key": "start_date",
-							"value": "2025-03-01"
+							"value": "2024-12-01"
 						},
 						{
 							"key": "end_date",
-							"value": "2025-03-19"
+							"value": "2024-12-15"
 						},
 						{
 							"key": "symbols",
