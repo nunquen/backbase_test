@@ -61,7 +61,7 @@ ROOT_URLCONF = 'mycurrency.base.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,8 +129,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CURRENCY_BEACON_API_KEY = "v8kpixcDpPwJKnyju6CeFknLGDDFDL56"
-
 
 class CustomLoggerAdapter(logging.LoggerAdapter):
     def process(self, msg, kwargs):
@@ -147,7 +145,5 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Apply to handlers
-# for handler in LOGGING.get("handlers", {}).values():
-#     if "formatter" in handler:
-#         handler["formatter"] = VersionedFormatter("%(asctime)s [%(levelname)s] [v%(version)s] %(message)s")
+BATCH_PROCESS_MAX_YEARS_TO_RETRIEVE = 5
+BATCH_PROCESS_SLEEP_TIME = 0.2

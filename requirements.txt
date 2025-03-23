@@ -7,3 +7,4 @@ pytest-cov==6.0.0
 pre_commit==4.2.0
 pytest_mock==3.14.0
 adrf==0.1.9
+asyncio==3.4.3

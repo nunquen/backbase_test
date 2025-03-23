@@ -46,12 +46,7 @@ def get_missing_rate_dates(
 
     # Case 1: we have all data in the database
     if not missing_dates:
-        db_exchange_rates = get_exchange_rates_grouped_by_date_and_currency(
-            source_currency=source_currency,
-            date_from=date_from,
-            date_to=date_to
-        )
-        return db_exchange_rates
+        return []
 
     # Case 2: we have missing dates so let's see if there're any gaps
     sorted_missing_dates = sorted(missing_dates)

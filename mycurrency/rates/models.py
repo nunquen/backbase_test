@@ -1,4 +1,6 @@
+import uuid
 from django.db import models
+from django.utils import timezone
 
 
 class Currency(models.Model):
@@ -51,3 +53,38 @@ class Provider(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BatchProcess(models.Model):
+    class Status(models.TextChoices):
+        PROCESSING = 'PROCESSING', 'Processing'
+        FAILED = 'FAILED', 'Failed'
+        DONE = 'DONE', 'Done'
+
+    process_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        unique=True
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PROCESSING
+    )
+    processes = models.IntegerField(default=0)
+    starting_time = models.DateTimeField(default=timezone.now)
+    ending_time = models.DateTimeField(null=True, blank=True)
+
+    source_currency = models.ForeignKey(
+        Currency,
+        on_delete=models.PROTECT,
+        related_name='batch_processes'
+    )
+    processes_counter = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["starting_time"]
+
+    def __str__(self):
+        return f"BatchProcess {self.process_id} on status {self.status}"
