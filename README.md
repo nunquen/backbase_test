@@ -84,6 +84,12 @@ Method      Endpoint            Description
 GET         /api/version/       Shows current API version
 ```
 
+### CONVERT MANY CURRENCIES AT THE SAME TIME
+```
+Use this separate form to submit your queries
+http://127.0.0.1:8000/converter/
+```
+
 ### RUN TESTS
 ```
 cd backbase_test

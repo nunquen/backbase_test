@@ -6,7 +6,8 @@ from .views import (
     CurrencyHistoryRateView,
     CurrencyRateView,
     CurrencyViewSet,
-    VersionView
+    VersionView,
+    Converter
 )
 
 router = DefaultRouter()
@@ -31,4 +32,5 @@ urlpatterns = [
         CurrencyHistoryRateView.as_view(),
         name='currency-history-rates'
     ),
+    path('converter/', Converter, name='converter'),
 ]

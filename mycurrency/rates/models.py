@@ -87,4 +87,8 @@ class BatchProcess(models.Model):
         ordering = ["starting_time"]
 
     def __str__(self):
-        return f"BatchProcess {self.process_id} on status {self.status}"
+        if self.processes == 0:
+            coverage = 0
+        else:
+            coverage = int(self.processes_counter * 100 / self.processes)
+        return f"BatchProcess {self.process_id} at {coverage}% - status: {self.status}"

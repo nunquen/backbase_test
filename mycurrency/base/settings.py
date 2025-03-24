@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # Custom apps
     'mycurrency.rates',
+    'base',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ ROOT_URLCONF = 'mycurrency.base.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates/'],
+        'DIRS': [os.path.join(BASE_DIR, 'base', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -147,3 +148,9 @@ logger = logging.getLogger(__name__)
 
 BATCH_PROCESS_MAX_YEARS_TO_RETRIEVE = 5
 BATCH_PROCESS_SLEEP_TIME = 0.2
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]

@@ -52,15 +52,15 @@
     -> Improvement
         - Link CurrencyExchangeRate with provider for future audit purpose (in case of discovering bad data)
 
-- ADMIN
+✅ CONVERT MANY CURRENCIES AT THE SAME TIME
     - Implement CONVERTER view: it could be possible to set a source currency and multiple target currencies.
 
-- ASYNC
+✅ ASYNC
     - Implement an asynchronous method to load this historical data as quickly and efficiently as possible, minimizing resource consumption.
     - What do you think is a better option: concurrency or parallelism?
     -> Approach: go month by month and retrieve each base currency in parallel
 
-- TEST
+✅ TEST
     - Provide a mechanism to ingest real-ish exchange rate data for testing purposes.
     - Define tests
 

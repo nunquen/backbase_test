@@ -1,9 +1,10 @@
 from asgiref.sync import sync_to_async
 from adrf.views import APIView
+from decimal import Decimal
+from django.conf import settings
+from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import serializers, status, viewsets
-from django.conf import settings
-
 
 import logging
 
@@ -12,7 +13,7 @@ from .lib.utils import validate_date
 from .models import Currency
 from .service.rater import get_exchange_rates, get_exchange_convertion
 from .service.batch_processor import batch_process
-from decimal import Decimal
+from .forms import CurrencyConverterForm
 
 
 logger = logging.getLogger(__name__)
@@ -198,3 +199,35 @@ class CurrencyHistoryRateView(APIView):
             response_body,
             status=status.HTTP_200_OK
         )
+
+
+def Converter(request):
+    conversion_results = []
+    if request.method == 'POST':
+        form = CurrencyConverterForm(request.POST)
+        if form.is_valid():
+            # Process the form data
+            source_currency = form.cleaned_data['source_currency']
+            exchanged_currencies = form.cleaned_data['exchanged_currency']
+            amount = form.cleaned_data['amount']
+
+            for exchanged_currency in exchanged_currencies:
+                convertion_rate = get_exchange_convertion(
+                    source_currency=source_currency.code,
+                    exchanged_currency=exchanged_currency.code,
+                    amount=amount
+                )
+                conversion_results.append(convertion_rate)
+
+    else:
+        form = CurrencyConverterForm()
+
+    context = {
+        'form': form,
+        'conversion_results': conversion_results
+    }
+    return render(
+        request,
+        'base/form.html',
+        context=context
+    )
