@@ -139,6 +139,14 @@ class CustomLoggerAdapter(logging.LoggerAdapter):
         return msg, kwargs
 
 
+# Define the log directory and file
+log_directory = 'mycurrency/logs'
+log_filename = 'myapp.log'
+log_filepath = os.path.join(log_directory, log_filename)
+
+# Create the log directory if it doesn't exist
+os.makedirs(log_directory, exist_ok=True)
+
 logging.basicConfig(
     filename='mycurrency/logs/myapp.log',
     level=logging.INFO,

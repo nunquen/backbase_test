@@ -1,15 +1,24 @@
 ### INSTALL APP
+#### Local Installation
 Follow these steps after having python3.11 installed:
 ```
 cd backbase_test/
 python3.11 -m venv venv
 source venv/bin/activate 
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r mycurrency/requirements.txt
+```
+#### Docker installation
+Follow these steps only if you have docker running in your system:
+```
+cd backbase_test/mycurrency
+docker build -t mycurrency . 
+docker run -p 8000:8000 mycurrency
 ```
 
 ### INIT MYCURRENCY APP
-1. Run the following commands to load migrations, create an admin user and run de server:
+
+1. Run the following commands to load migrations, create an admin user and run de server (skip this step if using Docker):
 ```
 PYTHONPATH=$(pwd) python mycurrency/manage.py migrate
 PYTHONPATH=$(pwd) python mycurrency/manage.py createsuperuser
@@ -19,6 +28,7 @@ PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
 2. Using the admin page, set the Private key for the CurrencyBacon provider
 - Assuming that MyCurrency app will be running in localhost and using port 8000:
 - Open http://127.0.0.1:8000/admin/ in a browser and connect using the admin user previously created
+Note: Docker uses user 'backbase' with the same password
 - Update CurrencyBacon provider: Home > Providers > CurrencyBacon
 
 #### MANAGE PROVIDERS
