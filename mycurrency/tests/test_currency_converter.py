@@ -18,6 +18,8 @@ def create_currencies():
     """Fixture to create test currencies in the database."""
     Currency.objects.get_or_create(code="USD", name="US Dollar", symbol="$")
     Currency.objects.get_or_create(code="EUR", name="Euro", symbol="€")
+    # Currency.objects.get_or_create(code="GBP", name="Pound Sterling", symbol="£")
+    # Currency.objects.get_or_create(code="CHF", name="Swiss Franc", symbol="CHF")
 
 
 @pytest.mark.django_db

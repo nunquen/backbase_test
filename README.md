@@ -102,6 +102,7 @@ http://127.0.0.1:8000/converter/
 
 ### RUN TESTS
 ```
+Note: run migration before testing
 cd backbase_test
 PYTHONPATH=$(pwd) python -m pytest --disable-warnings -v -s mycurrency/tests/test_*.py
 ```

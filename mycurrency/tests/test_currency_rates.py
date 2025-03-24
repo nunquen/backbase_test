@@ -9,7 +9,6 @@ from unittest.mock import patch
 from rates.models import Currency
 
 
-@pytest.fixture(scope="function", autouse=True)
 def clear_db():
     """Clears the database before each test to avoid UNIQUE constraint errors."""
     Currency.objects.all().delete()
@@ -26,6 +25,8 @@ def create_currencies():
     """Fixture to create test currencies in the database."""
     Currency.objects.get_or_create(code="USD", name="US Dollar", symbol="$")
     Currency.objects.get_or_create(code="EUR", name="Euro", symbol="€")
+    # Currency.objects.get_or_create(code="GBP", name="Pound Sterling", symbol="£")
+    # Currency.objects.get_or_create(code="CHF", name="Swiss Franc", symbol="CHF")
 
 
 @pytest.mark.django_db
