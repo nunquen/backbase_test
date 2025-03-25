@@ -35,7 +35,6 @@ PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
 2. Using the admin page, set the Private key for the CurrencyBacon provider
 - Assuming that MyCurrency app will be running in localhost and using port 8000:
 -   Open http://127.0.0.1:8000/admin/ in a browser and connect using the admin user previously created
-Note: Docker uses user 'backbase' with the same password
 -   Update CurrencyBacon provider: Home > Providers > CurrencyBacon
 
 #### MANAGE PROVIDERS
