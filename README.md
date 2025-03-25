@@ -1,4 +1,4 @@
-### INSTALL APP
+### INSTALL MyCURRENCE APP
 #### Local Installation
 Follow these steps after having python3.11 installed:
 ```
