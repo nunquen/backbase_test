@@ -11,7 +11,12 @@ class CurrencyExchangeRateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CurrencyExchangeRate
         # fields = '__all__'
-        fields = ['source_currency', 'exchanged_currency', 'valuation_date', 'rate_value']
+        fields = [
+            "source_currency",
+            "exchanged_currency",
+            "valuation_date",
+            "rate_value",
+        ]
 
     def get_source_currency(self, obj):
         # Returns the currency code for source_currency
@@ -20,9 +25,6 @@ class CurrencyExchangeRateSerializer(serializers.ModelSerializer):
     def get_exchanged_currency(self, obj):
         # Returns the currency code for exchanged_currency
         return obj.exchanged_currency.code
-
-    def get_valuation_date(self, obj):
-        return obj.valuation_date if type(obj.valuation_date) == str else obj.valuation_date.strftime("%Y-%m-%d")
 
     def get_rate_value(self, obj):
         return float(obj.rate_value)

@@ -5,7 +5,7 @@ form textarea {
     margin-bottom: 20px; /* Adjust the value as needed */
 }
 
-/* table {
+table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -27,7 +27,7 @@ tr:nth-child(even) {
 
 tr:hover {
     background-color: #f1f1f1;
-} */
+}
 
 .custom-alert {
     padding: 15px;

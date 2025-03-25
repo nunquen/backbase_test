@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import (
-    BatchProcess,
-    Currency,
-    CurrencyExchangeRate,
-    Provider
-)
+from .models import BatchProcess, Currency, CurrencyExchangeRate, Provider
 
 
 # Register the model

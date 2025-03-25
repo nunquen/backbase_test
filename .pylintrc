@@ -1,0 +1,6 @@
+[MASTER]
+ignore-patterns=.*_test\.py,.*test_.*\.py,00*_.py
+init-hook='import sys; sys.path.append(".env/lib/python3.9/site-packages")'
+[FORMAT]
+max-line-length=120
+disable=missing-module-docstring, missing-class-docstring, missing-function-docstring, consider-using-f-string,logging-format-interpolation,logging-fstring-interpolation,invalid-name,too-few-public-methods,unspecified-encoding, import-error, import-outside-toplevel, useless-super-delegation, raise-missing-from, no-self-use, too-many-locals, no-member, broad-except, unused-argument, duplicate-code

@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 22.3.0  # Use the latest stable version
+    hooks:
+      - id: black
+        language_version: python3  # You can adjust this depending on your environment
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.2  # Choose the appropriate version of flake8
+    hooks:
+      - id: flake8
+        args: ['--max-line-length=120']  # Customize options as needed
+        exclude: ^(test/test_.*\.py|.*migrations/.*)$
+
+  - repo: https://github.com/PyCQA/pylint
+    rev: v2.13.0  # Use the version that works for your project
+    hooks:
+      - id: pylint
+        name: pylint
+        language_version: python3
+        exclude: ^(test/test_.*\.py|.*migrations|.*test.*)$

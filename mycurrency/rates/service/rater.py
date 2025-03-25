@@ -1,25 +1,21 @@
 """
-This module provides services for retrieving exchange rates from the database 
+This module provides services for retrieving exchange rates from the database
 or fetching missing data from a remote provider when necessary.
-It ensures complete data coverage for a specified date range by detecting and 
+It ensures complete data coverage for a specified date range by detecting and
 filling gaps in exchange rate records.
 """
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from ..adapters.adapter_factory import (
     get_exchange_convertion_data,
-    get_exchange_rate_data
+    get_exchange_rate_data,
 )
-from .common import get_missing_rate_dates
+from .common import get_missing_rate_dates, save_data
 from ..domain.db import get_exchange_rates_grouped_by_date_and_currency
 from ..models import Currency, CurrencyExchangeRate
 
 
-def get_exchange_rates(
-    source_currency: str,
-    date_from: date,
-    date_to: date
-) -> list:
+def get_exchange_rates(source_currency: str, date_from: date, date_to: date) -> list:
     """
     Retrieves exchange rates for a given source currency and date range.
     If all required data is available in the database, it is returned directly.
@@ -31,7 +27,7 @@ def get_exchange_rates(
         date_to (date): The end date of the range for exchange rates.
 
     Returns:
-        list: A dictionary grouped by valuation date containing exchange rates 
+        list: A dictionary grouped by valuation date containing exchange rates
               for different currencies in the following structure:
 
               {
@@ -51,60 +47,40 @@ def get_exchange_rates(
     exchanged_currencies = ",".join(valid_currencies - {source_currency})
 
     subsets = get_missing_rate_dates(
-        source_currency=source_currency,
-        date_from=date_from,
-        date_to=date_to
+        source_currency=source_currency, date_from=date_from, date_to=date_to
     )
 
     # Fetching remote data
     data = {}
-    provider = None
     for gap in subsets:
-        new_data, provider = get_exchange_rate_data(
+        new_data, _ = get_exchange_rate_data(
             source_currency=source_currency,
             exchanged_currency=exchanged_currencies,
             date_from=gap[0],
-            date_to=gap[-1]
+            date_to=gap[-1],
         )
         data.update(new_data)
 
     # Saving data in data base
-    for date_rate, currency_data in data.items():
-        for currency, rate in currency_data.items():
-            if rate is None:
-                continue
-
-            source_currency_obj = Currency.objects.get(code=source_currency)
-            exchanged_obj = Currency.objects.get(code=currency)
-
-            CurrencyExchangeRate.objects.get_or_create(
-                source_currency=source_currency_obj,
-                exchanged_currency=exchanged_obj,
-                valuation_date=date_rate,
-                defaults={"rate_value": rate},
-            )
+    save_data(data=data, source_currency=source_currency)
 
     # Retrieving all data from database
     db_exchange_rates = get_exchange_rates_grouped_by_date_and_currency(
-            source_currency=source_currency,
-            date_from=date_from,
-            date_to=date_to
-        )
+        source_currency=source_currency, date_from=date_from, date_to=date_to
+    )
     return db_exchange_rates
 
 
 def get_exchange_convertion(
-    source_currency: str,
-    exchanged_currency: str,
-    amount: float
+    source_currency: str, exchanged_currency: str, amount: float
 ) -> dict:
     current_date = datetime.now().date()
     # Checking if we have to retrieve remote data
     db_rate = CurrencyExchangeRate.objects.filter(
-            source_currency__code=source_currency,
-            exchanged_currency__code=exchanged_currency,
-            valuation_date=current_date
-        ).first()
+        source_currency__code=source_currency,
+        exchanged_currency__code=exchanged_currency,
+        valuation_date=current_date,
+    ).first()
 
     if db_rate:
         data = {
@@ -112,15 +88,15 @@ def get_exchange_convertion(
             "source_currency": db_rate.source_currency.code,
             "exchanged_currency": db_rate.exchanged_currency.code,
             "amount": amount,
-            "value": amount * db_rate.rate_value
+            "value": amount * db_rate.rate_value,
         }
         return data
 
     # We need to retrieve remote data
-    data, provider_name = get_exchange_convertion_data(
+    data, _ = get_exchange_convertion_data(
         source_currency=source_currency,
         exchanged_currency=exchanged_currency,
-        amount=amount
+        amount=amount,
     )
     data.pop("timestamp", None)  # Not showing timestamp
 

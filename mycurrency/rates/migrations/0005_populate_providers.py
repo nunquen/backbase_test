@@ -10,7 +10,12 @@ def populate_providers(apps, schema_editor):
     Provider = apps.get_model("rates", "Provider")
 
     initial_providers = [
-        {"name": "CurrencyBeacon", "key": "your_currency_beacon_key", "is_enabled": True, "priority": 1},
+        {
+            "name": "CurrencyBeacon",
+            "key": "your_currency_beacon_key",
+            "is_enabled": True,
+            "priority": 1,
+        },
         {"name": "MockProvider", "key": "mock_key", "is_enabled": True, "priority": 2},
     ]
 
@@ -21,7 +26,7 @@ def populate_providers(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rates', '0004_provider'),
+        ("rates", "0004_provider"),
     ]
 
     operations = [

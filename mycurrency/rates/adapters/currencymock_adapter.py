@@ -18,7 +18,7 @@ class CurrencyMockAdapter(BaseExchangeRateAdapter):
         source_currency: str,
         exchanged_currency: str,
         date_from: date,
-        date_to: date
+        date_to: date,
     ) -> dict:
         """
         Generate mock exchange rate data for a given date range.
@@ -43,7 +43,8 @@ class CurrencyMockAdapter(BaseExchangeRateAdapter):
             current_date = date_from
             while current_date <= date_to:
                 data[current_date.strftime("%Y-%m-%d")] = {
-                    currency: round(random.uniform(0.5, 1.5), 8) for currency in currencies
+                    currency: round(random.uniform(0.5, 1.5), 8)
+                    for currency in currencies
                 }
                 current_date += timedelta(days=1)
 
@@ -52,10 +53,7 @@ class CurrencyMockAdapter(BaseExchangeRateAdapter):
             raise ValueError("Time Series rates not found")
 
     def get_exchange_convertion_data(
-        self,
-        source_currency: str,
-        exchanged_currency: str,
-        amount: Decimal
+        self, source_currency: str, exchanged_currency: str, amount: Decimal
     ) -> dict:
         """
         Generate mock exchange conversion data for a given currency pair and amount.
@@ -84,7 +82,7 @@ class CurrencyMockAdapter(BaseExchangeRateAdapter):
                 "source_currency": source_currency,
                 "exchanged_currency": exchanged_currency,
                 "amount": amount,
-                "value": round(random.uniform(0.5, 1.5), 8) * float(amount)
+                "value": round(random.uniform(0.5, 1.5), 8) * float(amount),
             }
             return data
         except Exception:

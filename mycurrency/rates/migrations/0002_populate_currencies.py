@@ -15,15 +15,14 @@ def populate_currencies(apps, schema_editor):
 
     for currency_data in currencies:
         Currency.objects.update_or_create(
-            code=currency_data["code"],
-            defaults=currency_data
+            code=currency_data["code"], defaults=currency_data
         )
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rates', '0001_initial'),
+        ("rates", "0001_initial"),
     ]
 
     operations = [

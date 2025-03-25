@@ -24,27 +24,26 @@ def create_currencies():
 @pytest.mark.asyncio
 async def test_batch_process_no_missing_dates(clear_db, create_currencies):
     with patch(
-        'rates.service.batch_processor.get_missing_rate_dates'
+        "rates.service.batch_processor.get_missing_rate_dates"
     ) as mock_get_missing_rate_dates:
         mock_get_missing_rate_dates.return_value = []
         process_id = await batch_process(
-            source_currency='USD',
-            valid_currencies={'USD', 'EUR'},
+            source_currency="USD",
+            valid_currencies={"USD", "EUR"},
             date_from=date(2025, 3, 1),
-            date_to=date(2025, 3, 31)
+            date_to=date(2025, 3, 31),
         )
 
-        process = await sync_to_async(
-            BatchProcess.objects.get,
-            thread_sensitive=False
-        )(process_id=process_id)
+        process = await sync_to_async(BatchProcess.objects.get, thread_sensitive=False)(
+            process_id=process_id
+        )
         assert process.status == BatchProcess.Status.DONE
 
 
 @pytest.mark.asyncio
 async def test_batch_process():
     mock_currency = MagicMock()
-    mock_currency.code = 'USD'
+    mock_currency.code = "USD"
 
     # Mock the BatchProcess model's 'create' method
     # mock_batch_process = MagicMock()
@@ -53,14 +52,12 @@ async def test_batch_process():
     # mock_batch_process.return_value = mock_batch_process_instance
 
     # Patch the 'get' and 'create' methods
-    with patch(
-        'rates.models.Currency.objects.get'
-    ) as mock_get, patch(
-        'rates.models.BatchProcess.objects.create'
+    with patch("rates.models.Currency.objects.get") as mock_get, patch(
+        "rates.models.BatchProcess.objects.create"
     ) as mock_batch_process_create, patch(
-        'rates.service.batch_processor.get_missing_rate_dates'
+        "rates.service.batch_processor.get_missing_rate_dates"
     ) as mock_get_missing_rate_dates, patch(
-        'rates.models.BatchProcess.save'
+        "rates.models.BatchProcess.save"
     ) as mock_save:
         mock_get.return_value = mock_currency
         mock_batch_process_create.return_value = mock_batch_process_instance
@@ -68,34 +65,36 @@ async def test_batch_process():
         mock_save.return_value = None
         # Call the function
         process_id = await batch_process(
-            source_currency='USD',
-            valid_currencies={'USD', 'EUR'},
+            source_currency="USD",
+            valid_currencies={"USD", "EUR"},
             date_from=date(2025, 3, 1),
-            date_to=date(2025, 3, 31)
+            date_to=date(2025, 3, 31),
         )
 
         # Assertions
-        mock_get.assert_called_once_with(code='USD')
+        mock_get.assert_called_once_with(code="USD")
         mock_batch_process_create.assert_called_once()
         assert process_id == mock_batch_process_instance.process_id
 
 
 def test_fetch_remote_data():
     with patch(
-        'rates.service.batch_processor.get_exchange_rate_data'
+        "rates.service.batch_processor.get_exchange_rate_data"
     ) as mock_get_exchange_rate_data:
-        mock_get_exchange_rate_data.return_value = ({'2024-11-29': {'EUR': 0.94531809}}, 'mockprovider')
+        mock_get_exchange_rate_data.return_value = (
+            {"2024-11-29": {"EUR": 0.94531809}},
+            "mockprovider",
+        )
 
         batch_process = BatchProcess.objects.create(
-            source_currency=Currency.objects.get(code="USD"),
-            processes=1
+            source_currency=Currency.objects.get(code="USD"), processes=1
         )
 
         fetch_remote_data(
             source_currency="USD",
             exchanged_currencies="EUR",
             date_range=[date(2025, 3, 1)],
-            process_id=batch_process.process_id
+            process_id=batch_process.process_id,
         )
 
         batch_process_updated = BatchProcess.objects.get(

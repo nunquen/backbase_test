@@ -14,24 +14,18 @@ class Currency(models.Model):
 
 class CurrencyExchangeRate(models.Model):
     source_currency = models.ForeignKey(
-        Currency,
-        related_name='exchanges',
-        on_delete=models.CASCADE
+        Currency, related_name="exchanges", on_delete=models.CASCADE
     )
     exchanged_currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
     valuation_date = models.DateField(db_index=True)
-    rate_value = models.DecimalField(
-        db_index=True,
-        decimal_places=6,
-        max_digits=18
-    )
+    rate_value = models.DecimalField(db_index=True, decimal_places=6, max_digits=18)
 
     class Meta:
         unique_together = (
-            'source_currency',
-            'exchanged_currency',
-            'valuation_date',
-            'rate_value'
+            "source_currency",
+            "exchanged_currency",
+            "valuation_date",
+            "rate_value",
         )
 
     def __str__(self):
@@ -43,10 +37,18 @@ class Provider(models.Model):
     Model representing an exchange rate provider.
     """
 
-    name = models.CharField(max_length=255, unique=True, help_text="Unique name of the provider.")
-    key = models.CharField(max_length=255, help_text="API key or identifier for the provider.")
-    is_enabled = models.BooleanField(default=True, help_text="Indicates if the provider is active.")
-    priority = models.PositiveIntegerField(unique=True, help_text="Priority order for provider selection.")
+    name = models.CharField(
+        max_length=255, unique=True, help_text="Unique name of the provider."
+    )
+    key = models.CharField(
+        max_length=255, help_text="API key or identifier for the provider."
+    )
+    is_enabled = models.BooleanField(
+        default=True, help_text="Indicates if the provider is active."
+    )
+    priority = models.PositiveIntegerField(
+        unique=True, help_text="Priority order for provider selection."
+    )
 
     class Meta:
         ordering = ["priority"]
@@ -57,29 +59,22 @@ class Provider(models.Model):
 
 class BatchProcess(models.Model):
     class Status(models.TextChoices):
-        PROCESSING = 'PROCESSING', 'Processing'
-        FAILED = 'FAILED', 'Failed'
-        DONE = 'DONE', 'Done'
+        PROCESSING = "PROCESSING", "Processing"
+        FAILED = "FAILED", "Failed"
+        DONE = "DONE", "Done"
 
     process_id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        unique=True
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True
     )
     status = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default=Status.PROCESSING
+        max_length=10, choices=Status.choices, default=Status.PROCESSING
     )
     processes = models.IntegerField(default=0)
     starting_time = models.DateTimeField(default=timezone.now)
     ending_time = models.DateTimeField(null=True, blank=True)
 
     source_currency = models.ForeignKey(
-        Currency,
-        on_delete=models.PROTECT,
-        related_name='batch_processes'
+        Currency, on_delete=models.PROTECT, related_name="batch_processes"
     )
     processes_counter = models.IntegerField(default=0)
 

@@ -31,12 +31,11 @@ def create_currencies():
 def test_currency_rate_invalid_source_currency(clear_db, api_client, create_currencies):
     """Test with an invalid source currency."""
     url = reverse(
-        'currency-rates',
-        kwargs={'version': 'v1'}  # Specify the version here
+        "currency-rates", kwargs={"version": "v1"}  # Specify the version here
     )
     response = api_client.get(
         url,
-        {"source_currency": "XYZ", "date_from": "2025-03-10", "date_to": "2025-03-10"}
+        {"source_currency": "XYZ", "date_from": "2025-03-10", "date_to": "2025-03-10"},
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -45,14 +44,15 @@ def test_currency_rate_invalid_source_currency(clear_db, api_client, create_curr
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "source_currency, date_from, date_to, error_message, status_code, description", [
+    "source_currency, date_from, date_to, error_message, status_code, description",
+    [
         (
             "USD",
             "10-03-2025",
             "2025-03-10",
             "Invalid date_from format",
             status.HTTP_400_BAD_REQUEST,
-            "> Validating bad date_from format"
+            "> Validating bad date_from format",
         ),
         (
             "USD",
@@ -60,7 +60,7 @@ def test_currency_rate_invalid_source_currency(clear_db, api_client, create_curr
             "2025-13-10",
             "Invalid date_to format",
             status.HTTP_400_BAD_REQUEST,
-            "> Validating bad date_to format"
+            "> Validating bad date_to format",
         ),
         (
             "USD",
@@ -68,9 +68,9 @@ def test_currency_rate_invalid_source_currency(clear_db, api_client, create_curr
             "2025-03-01",
             "Invalid date range",
             status.HTTP_400_BAD_REQUEST,
-            "> Validating bad date range"
-        )
-    ]
+            "> Validating bad date range",
+        ),
+    ],
 )
 def test_currency_rate_invalid_date_format(
     clear_db,
@@ -81,39 +81,43 @@ def test_currency_rate_invalid_date_format(
     date_to,
     error_message,
     status_code,
-    description
+    description,
 ):
     """Test with an invalid date format."""
     url = reverse(
-            'currency-rates',
-            kwargs={'version': 'v1'}  # Specify the version here
-        )
+        "currency-rates", kwargs={"version": "v1"}  # Specify the version here
+    )
     response = api_client.get(
         url,
         {
             "source_currency": source_currency,
             "date_from": date_from,
-            "date_to": date_to
-        }
+            "date_to": date_to,
+        },
     )
 
-    assert response.status_code == status_code and error_message in response.json()["error"], description
+    assert (
+        response.status_code == status_code
+        and error_message in response.json()["error"]
+    ), description
 
 
 @pytest.mark.django_db
 def test_currency_rate_exception_handling(clear_db, api_client, create_currencies):
     """Test unexpected exception handling."""
     with patch(
-        "rates.views.get_exchange_rates",
-        side_effect=Exception("Something went wrong")
+        "rates.views.get_exchange_rates", side_effect=Exception("Something went wrong")
     ) as mock_get_exchange_rates:
         url = reverse(
-            'currency-rates',
-            kwargs={'version': 'v1'}  # Specify the version here
+            "currency-rates", kwargs={"version": "v1"}  # Specify the version here
         )
         response = api_client.get(
             url,
-            {"source_currency": "USD", "date_from": "2025-03-10", "date_to": "2025-03-15"}
+            {
+                "source_currency": "USD",
+                "date_from": "2025-03-10",
+                "date_to": "2025-03-15",
+            },
         )
 
         mock_get_exchange_rates.assert_called()
@@ -127,21 +131,18 @@ def test_currency_rate_valid_request(clear_db, api_client, create_currencies):
     """Test the API with a valid request."""
     with patch(
         "rates.views.get_exchange_rates",
-        return_value={
-            "2025-03-10": {"USD/EUR": 1.085}
-        }
+        return_value={"2025-03-10": {"USD/EUR": 1.085}},
     ) as mock_get_exchange_rates:
         url = reverse(
-            'currency-rates',
-            kwargs={'version': 'v1'}  # Specify the version here
+            "currency-rates", kwargs={"version": "v1"}  # Specify the version here
         )
         response = api_client.get(
             url,
             {
                 "source_currency": "USD",
                 "date_from": "2025-03-10",
-                "date_to": "2025-03-15"
-            }
+                "date_to": "2025-03-15",
+            },
         )
 
         mock_get_exchange_rates.assert_called()

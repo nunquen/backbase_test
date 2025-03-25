@@ -30,7 +30,8 @@ def create_currencies():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "source, exchanged, date_from, date_to, valuation_date, rate_value, grouped_result, description",[
+    "source, exchanged, date_from, date_to, valuation_date, rate_value, grouped_result, description",
+    [
         (
             "USD",
             ["EUR", "GBP"],
@@ -38,8 +39,8 @@ def create_currencies():
             date(2025, 3, 10),
             date(2025, 3, 5),
             1.1,
-            {'2025-03-05': {'USD/EUR': 1.1, 'USD/GBP': 1.1}},
-            "Exchange rates"
+            {"2025-03-05": {"USD/EUR": 1.1, "USD/GBP": 1.1}},
+            "Exchange rates",
         ),
     ],
 )
@@ -53,7 +54,7 @@ def test_exchange_rates_grouping(
     valuation_date,
     rate_value,
     grouped_result,
-    description
+    description,
 ):
     # Create test data
     source_currency_obj = Currency.objects.get(code=source)
@@ -63,14 +64,12 @@ def test_exchange_rates_grouping(
             source_currency=source_currency_obj,
             exchanged_currency=exchanged_obj,
             valuation_date=valuation_date,
-            rate_value=rate_value
+            rate_value=rate_value,
         )
 
     # Call the function
     result = get_exchange_rates_grouped_by_date_and_currency(
-        source_currency=source,
-        date_from=date_from,
-        date_to=date_to
+        source_currency=source, date_from=date_from, date_to=date_to
     )
 
     # Assert the results

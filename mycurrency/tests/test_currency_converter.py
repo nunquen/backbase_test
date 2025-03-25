@@ -29,7 +29,8 @@ def create_currencies():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "source_currency, exchanged_currency, amount, error_message, status_code, error_key, description", [
+    "source_currency, exchanged_currency, amount, error_message, status_code, error_key, description",
+    [
         (
             "USx",
             "GBP",
@@ -129,7 +130,7 @@ def create_currencies():
             "amount",
             "> Testing amount should have 2 decimal places",
         ),
-    ]
+    ],
 )
 def test_currency_converter_input_parameters(
     clear_db,
@@ -141,39 +142,41 @@ def test_currency_converter_input_parameters(
     error_message,
     status_code,
     error_key,
-    description
+    description,
 ):
     """Test with an invalid date format."""
     url = reverse(
-        'currency-converter',
-        kwargs={'version': 'v1'}  # Specify the version here
+        "currency-converter", kwargs={"version": "v1"}  # Specify the version here
     )
     response = api_client.get(
         url,
         {
             "source_currency": source_currency,
             "exchanged_currency": exchanged_currency,
-            "amount": amount
-        }
+            "amount": amount,
+        },
     )
     response_data = response.json()
-    assert response.status_code == status_code and error_message in response_data[error_key], description
+    assert (
+        response.status_code == status_code
+        and error_message in response_data[error_key]
+    ), description
 
 
 @pytest.mark.django_db
-def test_currency_convertion_exception_handling(clear_db, api_client, create_currencies):
+def test_currency_convertion_exception_handling(
+    clear_db, api_client, create_currencies
+):
     """Test unexpected exception handling."""
     with patch(
         "rates.views.get_exchange_convertion",
-        side_effect=Exception("Something went wrong")
+        side_effect=Exception("Something went wrong"),
     ) as mock_get_exchange_convertion:
         url = reverse(
-            'currency-converter',
-            kwargs={'version': 'v1'}  # Specify the version here
+            "currency-converter", kwargs={"version": "v1"}  # Specify the version here
         )
         response = api_client.get(
-            url,
-            {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0}
+            url, {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0}
         )
 
         mock_get_exchange_convertion.assert_called()
@@ -192,16 +195,14 @@ def test_currency_convertion_success(clear_db, api_client, create_currencies):
             "from": "USD",
             "to": "EUR",
             "amount": 1.0,
-            "value": 1.221674
-        }
+            "value": 1.221674,
+        },
     ) as mock_get_exchange_convertion:
         url = reverse(
-            'currency-converter',
-            kwargs={'version': 'v1'}  # Specify the version here
+            "currency-converter", kwargs={"version": "v1"}  # Specify the version here
         )
         response = api_client.get(
-            url,
-            {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0}
+            url, {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0}
         )
         response_data = response.json()
 

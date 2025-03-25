@@ -41,7 +41,7 @@ def create_currencies():
             {
                 "source_currency": "EUR",
                 "date_from": "2025-03-15",
-                "date_to": "2025-03-15"
+                "date_to": "2025-03-15",
             },
             "> Validating: Currency rates v1",
         ),
@@ -55,7 +55,7 @@ def create_currencies():
             {
                 "source_currency": "EUR",
                 "date_from": "2025-03-15",
-                "date_to": "2025-03-15"
+                "date_to": "2025-03-15",
             },
             "> Validating: Currency rates v2",
         ),
@@ -69,7 +69,7 @@ def create_currencies():
             {
                 "source_currency": "EUR",
                 "date_from": "2025-03-15",
-                "date_to": "2025-03-15"
+                "date_to": "2025-03-15",
             },
             "> Validating: Exception on Currency rates v3",
         ),
@@ -84,7 +84,7 @@ def create_currencies():
                 "from": "USD",
                 "to": "EUR",
                 "amount": 1.0,
-                "value": 1.221674
+                "value": 1.221674,
             },
             {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0},
             "> Validating: Currency converter v1",
@@ -100,7 +100,7 @@ def create_currencies():
                 "from": "USD",
                 "to": "EUR",
                 "amount": 1.0,
-                "value": 1.221674
+                "value": 1.221674,
             },
             {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0},
             "> Validating: Currency converter v2",
@@ -116,7 +116,7 @@ def create_currencies():
                 "from": "USD",
                 "to": "EUR",
                 "amount": 1.0,
-                "value": 1.221674
+                "value": 1.221674,
             },
             {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0},
             "> Validating: Exception on Currency converter v3",
@@ -128,7 +128,11 @@ def create_currencies():
             "POST",
             "rates.views.batch_process",
             {"process_id": "3b6b9a3d-7136-4e82-8229-49ac686f7466"},
-            {"source_currency": "USD", "date_from": "2024-11-29", "date_to": "2024-12-21"},
+            {
+                "source_currency": "USD",
+                "date_from": "2024-11-29",
+                "date_to": "2024-12-21",
+            },
             "> Validating: Currency history rates v2",
         ),
         (
@@ -138,10 +142,14 @@ def create_currencies():
             "POST",
             "rates.views.batch_process",
             {"process_id": "3b6b9a3d-7136-4e82-8229-49ac686f7466"},
-            {"source_currency": "USD", "date_from": "2024-11-29", "date_to": "2024-12-21"},
+            {
+                "source_currency": "USD",
+                "date_from": "2024-11-29",
+                "date_to": "2024-12-21",
+            },
             "> Validating: Exception on Currency history rates v1",
-        )
-    ]
+        ),
+    ],
 )
 def test_endpoints_versioning(
     version,
@@ -154,16 +162,14 @@ def test_endpoints_versioning(
     description,
     clear_db,
     api_client,
-    create_currencies
+    create_currencies,
 ):
     with patch(
-        patch_function,
-        return_value=patch_return_value
+        patch_function, return_value=patch_return_value
     ) as mock_get_exchange_rates:
         try:
             url = reverse(
-                endpoint,
-                kwargs={'version': version}  # Specify the version here
+                endpoint, kwargs={"version": version}  # Specify the version here
             )
             if method == "GET":
                 response = api_client.get(url, params)

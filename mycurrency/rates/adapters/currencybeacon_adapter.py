@@ -1,8 +1,8 @@
 import logging
 import json
-import requests
 from datetime import date
 from decimal import Decimal
+import requests
 
 from .base_adapter import BaseExchangeRateAdapter
 
@@ -28,7 +28,7 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
         source_currency: str,
         exchanged_currency: str,
         date_from: date,
-        date_to: date
+        date_to: date,
     ) -> dict:
         """
         Fetch historical exchange rates from CurrencyBeacon API for a given date range.
@@ -46,23 +46,21 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
             ValueError: If the API request fails or the response does not contain expected data.
         """
         try:
-            headers = {
-                "Authorization": "Bearer {}".format(
-                    self.api_key
-                )
-            }
+            headers = {"Authorization": "Bearer {}".format(self.api_key)}
             params = {
                 "start_date": date_from.strftime("%Y-%m-%d"),
                 "end_date": date_to.strftime("%Y-%m-%d"),
                 "base": source_currency,
-                "symbols": exchanged_currency
+                "symbols": exchanged_currency,
             }
             endpoint = "{}/timeseries".format(CurrencyBeaconAdapter.BASE_URL)
             response = requests.get(endpoint, params=params, headers=headers)
 
             if response.status_code != 200:
                 msg = json.loads(response.text)["meta"]["error_detail"]
-                error_msg = f"API request failed: {response.status_code} - {msg}"  # noqa: E501
+                error_msg = (
+                    f"API request failed: {response.status_code} - {msg}"  # noqa: E501
+                )
                 logger.error(error_msg)
                 raise ValueError(error_msg)
 
@@ -70,16 +68,13 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
 
             if "response" in data:
                 return data["response"]
-            else:
-                raise ValueError("Time Series rates not found")
+
+            raise ValueError("Time Series rates not found")
         except Exception as e:
             raise e
 
     def get_exchange_convertion_data(
-        self,
-        source_currency: str,
-        exchanged_currency: str,
-        amount: Decimal
+        self, source_currency: str, exchanged_currency: str, amount: Decimal
     ) -> dict:
         """
         Fetch real-time currency conversion data from CurrencyBeacon API.
@@ -103,22 +98,20 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
         """
         try:
             error_msg = ""
-            headers = {
-                "Authorization": "Bearer {}".format(
-                    self.api_key
-                )
-            }
+            headers = {"Authorization": "Bearer {}".format(self.api_key)}
             params = {
                 "from": source_currency,
                 "to": exchanged_currency,
-                "amount": amount
+                "amount": amount,
             }
             endpoint = "{}/convert".format(CurrencyBeaconAdapter.BASE_URL)
             response = requests.get(endpoint, params=params, headers=headers)
 
             if response.status_code != 200:
                 msg = json.loads(response.text)["meta"]["error_detail"]
-                error_msg = f"API request failed: {response.status_code} - {msg}"  # noqa: E501
+                error_msg = (
+                    f"API request failed: {response.status_code} - {msg}"  # noqa: E501
+                )
                 logger.error(error_msg)
                 raise ValueError(error_msg)
 
@@ -131,11 +124,11 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
                     "source_currency": data["response"]["from"],
                     "exchanged_currency": data["response"]["to"],
                     "amount": data["response"]["amount"],
-                    "value": data["response"]["value"]
+                    "value": data["response"]["value"],
                 }
                 return parsed_data
-            else:
-                raise ValueError("Time Series rates not found")
+
+            raise ValueError("Time Series rates not found")
 
         except Exception as e:
             raise ValueError(e)

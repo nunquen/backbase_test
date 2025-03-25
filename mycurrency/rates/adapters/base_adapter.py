@@ -24,7 +24,7 @@ class BaseExchangeRateAdapter(ABC):
         source_currency: str,
         exchanged_currency: str,
         date_from: date,
-        date_to: date
+        date_to: date,
     ) -> dict:
         """
         Fetch exchange rates from the provider.
@@ -32,10 +32,7 @@ class BaseExchangeRateAdapter(ABC):
 
     @abstractmethod
     def get_exchange_convertion_data(
-        self,
-        source_currency: str,
-        exchanged_currency: str,
-        amount: Decimal
+        self, source_currency: str, exchanged_currency: str, amount: Decimal
     ) -> dict:
         """
         Fetch exchange convertion from the provider.

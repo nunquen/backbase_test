@@ -1,14 +1,14 @@
 """
 Adapter Factory for Fetching Exchange Rate Data
 
-This module serves as an adapter factory that dynamically provides access 
-to different exchange rate providers (e.g., "currencybeacon"). It maps 
-provider names to their respective adapter classes and uses the 
-appropriate adapter to retrieve exchange rate data for a specified 
+This module serves as an adapter factory that dynamically provides access
+to different exchange rate providers (e.g., "currencybeacon"). It maps
+provider names to their respective adapter classes and uses the
+appropriate adapter to retrieve exchange rate data for a specified
 source currency, exchanged currency, and date range.
 
-The factory pattern allows for easy extension and addition of new providers 
-without changing the core logic of the system. The provider used is determined 
+The factory pattern allows for easy extension and addition of new providers
+without changing the core logic of the system. The provider used is determined
 dynamically at runtime.
 
 Functions:
@@ -29,22 +29,21 @@ Example:
 """
 from datetime import date
 from typing import Union
-from .currencybeacon_adapter import CurrencyBeaconAdapter
-from .currencymock_adapter import CurrencyMockAdapter
-from rates.models import Provider
 from decimal import Decimal
 import logging
+from rates.models import Provider
+from .currencybeacon_adapter import CurrencyBeaconAdapter
+from .currencymock_adapter import CurrencyMockAdapter
 
 
 logger = logging.getLogger(__name__)
 
 PROVIDER_MAPPING = {
     "CurrencyBeacon": CurrencyBeaconAdapter,
-    "MockProvider": CurrencyMockAdapter
+    "MockProvider": CurrencyMockAdapter,
 }
 
 
-# TODO: have this from the database
 def get_provider() -> Provider:
     """
     Retrieve the relevant Provider for fetching exchange rate data.
@@ -63,10 +62,7 @@ def get_provider() -> Provider:
 
 
 def get_exchange_rate_data(
-    source_currency: str,
-    exchanged_currency: str,
-    date_from: date,
-    date_to: date
+    source_currency: str, exchanged_currency: str, date_from: date, date_to: date
 ) -> Union[dict, str]:
     """
     Fetch exchange rate data for a given source and exchanged currency within the specified date range.
@@ -107,7 +103,7 @@ def get_exchange_rate_data(
             exchanged_currency=exchanged_currency,
             source_currency=source_currency,
             date_from=date_from,
-            date_to=date_to
+            date_to=date_to,
         )
         return data, provider.name
     except Exception as e:
@@ -115,9 +111,7 @@ def get_exchange_rate_data(
 
 
 def get_exchange_convertion_data(
-    source_currency: str,
-    exchanged_currency: str,
-    amount: Decimal
+    source_currency: str, exchanged_currency: str, amount: Decimal
 ) -> dict:
     provider = get_provider()
     adapter_class = PROVIDER_MAPPING.get(provider.name)
@@ -133,7 +127,7 @@ def get_exchange_convertion_data(
         data = adapter_instance.get_exchange_convertion_data(
             source_currency=source_currency,
             exchanged_currency=exchanged_currency,
-            amount=amount
+            amount=amount,
         )
         return data, provider.name
     except Exception as e:

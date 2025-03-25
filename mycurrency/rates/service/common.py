@@ -1,14 +1,11 @@
 from datetime import date, timedelta
 from typing import List
 
-from ..domain.db import get_exchange_rates_grouped_by_date_and_currency
-from ..models import CurrencyExchangeRate
+from ..models import CurrencyExchangeRate, Currency
 
 
 def get_missing_rate_dates(
-    source_currency: str,
-    date_from: date,
-    date_to: date
+    source_currency: str, date_from: date, date_to: date
 ) -> List[List[date]]:
     """
     Identify missing currency exchange rate dates within a specified date range.
@@ -34,11 +31,13 @@ def get_missing_rate_dates(
          [datetime.date(2023, 1, 7)]]
     """
     # Checking if we have to retrieve remote data
-    date_range = {date_from + timedelta(days=i) for i in range((date_to - date_from).days + 1)}
+    date_range = {
+        date_from + timedelta(days=i) for i in range((date_to - date_from).days + 1)
+    }
     db_date_range = set(
         CurrencyExchangeRate.objects.filter(
             source_currency__code=source_currency,
-            valuation_date__range=(date_from, date_to)
+            valuation_date__range=(date_from, date_to),
         ).values_list("valuation_date", flat=True)
     )
     # Identify missing dates
@@ -66,3 +65,20 @@ def get_missing_rate_dates(
     # Add the last subset
     response.append(current_subset)
     return response
+
+
+def save_data(data: dict, source_currency: str):
+    for date_rate, currency_data in data.items():
+        for currency, rate in currency_data.items():
+            if rate is None:
+                continue
+
+            source_currency_obj = Currency.objects.get(code=source_currency)
+            exchanged_obj = Currency.objects.get(code=currency)
+
+            CurrencyExchangeRate.objects.get_or_create(
+                source_currency=source_currency_obj,
+                exchanged_currency=exchanged_obj,
+                valuation_date=date_rate,
+                defaults={"rate_value": rate},
+            )

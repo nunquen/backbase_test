@@ -8,9 +8,7 @@ from ..models import CurrencyExchangeRate
 
 
 def get_exchange_rates_grouped_by_date_and_currency(
-    source_currency: str,
-    date_from: date,
-    date_to: date
+    source_currency: str, date_from: date, date_to: date
 ) -> dict:
     """
     Fetches exchange rates from the database, filters them by source currency
@@ -18,7 +16,7 @@ def get_exchange_rates_grouped_by_date_and_currency(
     The data is returned as a dictionary.
 
     Args:
-        source_currency (str): The currency code for the source currency 
+        source_currency (str): The currency code for the source currency
             (e.g., 'USD', 'EUR').
         date_from (date): The start date for the range to fetch exchange rates.
         date_to (date): The end date for the range to fetch exchange rates.
@@ -46,10 +44,14 @@ def get_exchange_rates_grouped_by_date_and_currency(
 
     """
     # Getting CurrencyExchangeRate by source_currency and valuation_date range
-    exchange_rate_queryset = CurrencyExchangeRate.objects.filter(
-        source_currency__code=source_currency,
-        valuation_date__range=(date_from, date_to)
-    ).select_related('exchanged_currency').order_by('valuation_date', 'exchanged_currency__code') 
+    exchange_rate_queryset = (
+        CurrencyExchangeRate.objects.filter(
+            source_currency__code=source_currency,
+            valuation_date__range=(date_from, date_to),
+        )
+        .select_related("exchanged_currency")
+        .order_by("valuation_date", "exchanged_currency__code")
+    )
 
     # Prepare a dictionary to store the results
     response = defaultdict(dict)

@@ -12,9 +12,11 @@ import sys
 
 from django.core.asgi import get_asgi_application
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # Adds 'backbase/' to Python path
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(__file__))
+)  # Adds 'backbase/' to Python path
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mycurrency.base.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mycurrency.base.settings")
 
 application = get_asgi_application()
