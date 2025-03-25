@@ -4,12 +4,13 @@ from rates.models import CurrencyExchangeRate
 from rates.domain.db import get_exchange_rates_grouped_by_date_and_currency
 from rest_framework.test import APIClient
 
-from rates.models import Currency
+from rates.models import BatchProcess, Currency
 
 
 @pytest.fixture
 def clear_db():
     """Clears the database before each test to avoid UNIQUE constraint errors."""
+    BatchProcess.objects.all().delete()
     Currency.objects.all().delete()
 
 

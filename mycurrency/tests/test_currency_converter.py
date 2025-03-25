@@ -4,12 +4,13 @@ from unittest.mock import patch
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from rates.models import Currency
+from rates.models import BatchProcess, Currency
 
 
 @pytest.fixture
 def clear_db():
     """Clears the database before each test to avoid UNIQUE constraint errors."""
+    BatchProcess.objects.all().delete()
     Currency.objects.all().delete()
 
 
