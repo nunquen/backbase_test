@@ -46,7 +46,8 @@ def sync_get_missing_rate_dates(
     date_from: date,
     date_to: date
 ) -> List:
-    return get_missing_rate_dates(source_currency, date_from, date_to)
+    missing_rates_dates = get_missing_rate_dates(source_currency, date_from, date_to)
+    return missing_rates_dates
 
 
 def fetch_remote_data(

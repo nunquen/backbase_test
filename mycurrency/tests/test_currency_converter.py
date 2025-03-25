@@ -8,6 +8,12 @@ from rates.models import Currency
 
 
 @pytest.fixture
+def clear_db():
+    """Clears the database before each test to avoid UNIQUE constraint errors."""
+    Currency.objects.all().delete()
+
+
+@pytest.fixture
 def api_client():
     """Fixture for the Django REST Framework API client."""
     return APIClient()
@@ -18,8 +24,6 @@ def create_currencies():
     """Fixture to create test currencies in the database."""
     Currency.objects.get_or_create(code="USD", name="US Dollar", symbol="$")
     Currency.objects.get_or_create(code="EUR", name="Euro", symbol="€")
-    # Currency.objects.get_or_create(code="GBP", name="Pound Sterling", symbol="£")
-    # Currency.objects.get_or_create(code="CHF", name="Swiss Franc", symbol="CHF")
 
 
 @pytest.mark.django_db
@@ -127,6 +131,7 @@ def create_currencies():
     ]
 )
 def test_currency_converter_input_parameters(
+    clear_db,
     api_client,
     create_currencies,
     source_currency,
@@ -138,8 +143,12 @@ def test_currency_converter_input_parameters(
     description
 ):
     """Test with an invalid date format."""
+    url = reverse(
+        'currency-converter',
+        kwargs={'version': 'v1'}  # Specify the version here
+    )
     response = api_client.get(
-        reverse("currency-converter"),
+        url,
         {
             "source_currency": source_currency,
             "exchanged_currency": exchanged_currency,
@@ -151,16 +160,19 @@ def test_currency_converter_input_parameters(
 
 
 @pytest.mark.django_db
-def test_currency_convertion_exception_handling(api_client, create_currencies):
+def test_currency_convertion_exception_handling(clear_db, api_client, create_currencies):
     """Test unexpected exception handling."""
     with patch(
         "rates.views.get_exchange_convertion",
         side_effect=Exception("Something went wrong")
     ) as mock_get_exchange_convertion:
-
+        url = reverse(
+            'currency-converter',
+            kwargs={'version': 'v1'}  # Specify the version here
+        )
         response = api_client.get(
-            reverse("currency-converter"),
-            {"source_currency": "USD", "exchanged_currency": "GBP", "amount": 1.0}
+            url,
+            {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0}
         )
 
         mock_get_exchange_convertion.assert_called()
@@ -170,22 +182,25 @@ def test_currency_convertion_exception_handling(api_client, create_currencies):
 
 
 @pytest.mark.django_db
-def test_currency_convertion_success(api_client, create_currencies):
+def test_currency_convertion_success(clear_db, api_client, create_currencies):
     """Test success response."""
     with patch(
         "rates.views.get_exchange_convertion",
         return_value={
             "date": "2025-03-20",
             "from": "USD",
-            "to": "GBP",
+            "to": "EUR",
             "amount": 1.0,
             "value": 1.221674
         }
     ) as mock_get_exchange_convertion:
-
+        url = reverse(
+            'currency-converter',
+            kwargs={'version': 'v1'}  # Specify the version here
+        )
         response = api_client.get(
-            reverse("currency-converter"),
-            {"source_currency": "USD", "exchanged_currency": "GBP", "amount": 1.0}
+            url,
+            {"source_currency": "USD", "exchanged_currency": "EUR", "amount": 1.0}
         )
         response_data = response.json()
 

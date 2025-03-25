@@ -1,53 +1,75 @@
 {% load static %}
 
-<h1>Rate converter</h1>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Rate Converter</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
+<body>
+    <h1>Rate converter</h1>
+    <!-- Display error message if 'error' variable exists -->
+    {% if error %}
+    <div style="
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ebccd1; /* Light red border */
+        border-radius: 4px;
+        color: #a94442; /* Dark red text */
+        background-color: #f2dede; /* Light red background */
+    ">
+        <h3>{{ error }}</h3>
+    </div>
+    </br>
+    {% endif %}
 
-<form method="post" action="{% url 'converter' %}">
-    {% csrf_token %}
-    {% for field in form %}
-        {% comment %} {{ field.as_field_group }} {% endcomment %}
-        <div class="form-group">
-            {{ field.label_tag }}
-            {{ field }}
-            {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-            {% endif %}
-            {% for error in field.errors %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endfor %}
-    
-    <button type="submit" class="btn btn-primary">Convert</button>
-</form>
-{% if conversion_results %}
-    <h2>Conversion Results</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Source Currency</th>
-                <th>Exchanged Currency</th>
-                <th>Amount</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for result in conversion_results %}
-                <tr>
-                    <td>{{ result.date }}</td>
-                    <td>{{ result.source_currency }}</td>
-                    <td>{{ result.exchanged_currency }}</td>
-                    <td>{{ result.amount }}</td>
-                    <td>{{ result.value }}</td>
+    <form method="post" action="{% url 'converter' %}">
+        {% csrf_token %}
+        {% for field in form %}
+            {% comment %} {{ field.as_field_group }} {% endcomment %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">Convert</button>
+    </form>
+    {% if conversion_results %}
+        <h2>Conversion Results</h2>
+        <table>
+            <thead>
+                <tr style="
+                    background-color: #5957e8;
+                    color:rgb(101, 99, 217);
+                "> 
+                    <th>Date</th>
+                    <th>Source Currency</th>
+                    <th>Exchanged Currency</th>
+                    <th>Amount</th>
+                    <th>Value</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No conversion results available.</p>
-{% endif %}
+            </thead>
+            <tbody>
+                {% for result in conversion_results %}
+                    <tr>
+                        <td>{{ result.date }}</td>
+                        <td>{{ result.source_currency }}</td>
+                        <td>{{ result.exchanged_currency }}</td>
+                        <td>{{ result.amount }}</td>
+                        <td>{{ result.value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No conversion results available.</p>
+    {% endif %}
+</body>
+</html>

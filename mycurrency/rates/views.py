@@ -213,6 +213,7 @@ class CurrencyHistoryRateView(APIView):
 def Converter(request, *args, **kwargs):
     version = kwargs.get('version')
     conversion_results = []
+    error = None
     if request.method == 'POST':
         form = CurrencyConverterForm(request.POST)
         if form.is_valid():
@@ -223,28 +224,31 @@ def Converter(request, *args, **kwargs):
 
             logger.info("Converter {} requested for {} to {} with amount of {}".format(
                 version,
-                source_currency,
-                ",".join(exchanged_currencies),
+                source_currency.code,
+                ",".join([currency.code for currency in exchanged_currencies]),
                 amount
             ))
-
-            for exchanged_currency in exchanged_currencies:
-                convertion_rate = get_exchange_convertion(
-                    source_currency=source_currency.code,
-                    exchanged_currency=exchanged_currency.code,
-                    amount=amount
-                )
-                conversion_results.append(convertion_rate)
+            try:
+                for exchanged_currency in exchanged_currencies:
+                    convertion_rate = get_exchange_convertion(
+                        source_currency=source_currency.code,
+                        exchanged_currency=exchanged_currency.code,
+                        amount=amount
+                    )
+                    conversion_results.append(convertion_rate)
+            except Exception as e:
+                error = str(e)
 
     else:
         form = CurrencyConverterForm()
 
     context = {
         'form': form,
-        'conversion_results': conversion_results
+        'conversion_results': conversion_results,
+        'error': error
     }
     return render(
-        request,
-        'base/form.html',
+        request=request,
+        template_name='base/form.html',
         context=context
     )

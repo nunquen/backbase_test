@@ -1,14 +1,13 @@
 import pytest
-from datetime import datetime
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from unittest import mock
 from unittest.mock import patch
 
 from rates.models import Currency
 
 
+@pytest.fixture
 def clear_db():
     """Clears the database before each test to avoid UNIQUE constraint errors."""
     Currency.objects.all().delete()
@@ -25,15 +24,17 @@ def create_currencies():
     """Fixture to create test currencies in the database."""
     Currency.objects.get_or_create(code="USD", name="US Dollar", symbol="$")
     Currency.objects.get_or_create(code="EUR", name="Euro", symbol="€")
-    # Currency.objects.get_or_create(code="GBP", name="Pound Sterling", symbol="£")
-    # Currency.objects.get_or_create(code="CHF", name="Swiss Franc", symbol="CHF")
 
 
 @pytest.mark.django_db
-def test_currency_rate_invalid_source_currency(api_client, create_currencies):
+def test_currency_rate_invalid_source_currency(clear_db, api_client, create_currencies):
     """Test with an invalid source currency."""
+    url = reverse(
+        'currency-rates',
+        kwargs={'version': 'v1'}  # Specify the version here
+    )
     response = api_client.get(
-        reverse("currency-rates"),
+        url,
         {"source_currency": "XYZ", "date_from": "2025-03-10", "date_to": "2025-03-10"}
     )
 
@@ -71,6 +72,7 @@ def test_currency_rate_invalid_source_currency(api_client, create_currencies):
     ]
 )
 def test_currency_rate_invalid_date_format(
+    clear_db,
     api_client,
     create_currencies,
     source_currency,
@@ -81,8 +83,12 @@ def test_currency_rate_invalid_date_format(
     description
 ):
     """Test with an invalid date format."""
+    url = reverse(
+            'currency-rates',
+            kwargs={'version': 'v1'}  # Specify the version here
+        )
     response = api_client.get(
-        reverse("currency-rates"),
+        url,
         {
             "source_currency": source_currency,
             "date_from": date_from,
@@ -94,15 +100,18 @@ def test_currency_rate_invalid_date_format(
 
 
 @pytest.mark.django_db
-def test_currency_rate_exception_handling(api_client, create_currencies):
+def test_currency_rate_exception_handling(clear_db, api_client, create_currencies):
     """Test unexpected exception handling."""
     with patch(
         "rates.views.get_exchange_rates",
         side_effect=Exception("Something went wrong")
     ) as mock_get_exchange_rates:
-
+        url = reverse(
+            'currency-rates',
+            kwargs={'version': 'v1'}  # Specify the version here
+        )
         response = api_client.get(
-            reverse("currency-rates"),
+            url,
             {"source_currency": "USD", "date_from": "2025-03-10", "date_to": "2025-03-15"}
         )
 
@@ -113,7 +122,7 @@ def test_currency_rate_exception_handling(api_client, create_currencies):
 
 
 @pytest.mark.django_db
-def test_currency_rate_valid_request(api_client, create_currencies):
+def test_currency_rate_valid_request(clear_db, api_client, create_currencies):
     """Test the API with a valid request."""
     with patch(
         "rates.views.get_exchange_rates",
@@ -121,10 +130,17 @@ def test_currency_rate_valid_request(api_client, create_currencies):
             "2025-03-10": {"USD/EUR": 1.085}
         }
     ) as mock_get_exchange_rates:
-
+        url = reverse(
+            'currency-rates',
+            kwargs={'version': 'v1'}  # Specify the version here
+        )
         response = api_client.get(
-            reverse("currency-rates"),
-            {"source_currency": "USD", "date_from": "2025-03-10", "date_to": "2025-03-15"}
+            url,
+            {
+                "source_currency": "USD",
+                "date_from": "2025-03-10",
+                "date_to": "2025-03-15"
+            }
         )
 
         mock_get_exchange_rates.assert_called()
