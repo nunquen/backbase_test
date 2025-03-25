@@ -35,7 +35,8 @@ class CurrencyConverterView(APIView):
     API View to retrieve real time currency convertion for an specific amount.
     """
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        version = kwargs.get('version')
         data = request.query_params.copy()
         if "amount" in data:
             try:
@@ -52,7 +53,8 @@ class CurrencyConverterView(APIView):
         exchanged_currency = validated_data['exchanged_currency']
         amount = validated_data['amount']
 
-        logger.info("Currency Convertion requested for {}, from {} to {}".format(
+        logger.info("Currency Convertion {} requested for {}, from {} to {}".format(
+            version,
             source_currency,
             exchanged_currency,
             amount
@@ -89,11 +91,13 @@ class CurrencyRateView(APIView):
     API View to retrieve currency rates for a particular time range.
     """
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        version = kwargs.get('version')
         source_currency = request.GET.get("source_currency")
         date_from = request.GET.get("date_from")
         date_to = request.GET.get("date_to")
-        logger.info("Currency Rates requested for {}, from {} to {}".format(
+        logger.info("Currency Rates {} requested for {}, from {} to {}".format(
+            version,
             source_currency,
             date_from,
             date_to
@@ -153,11 +157,13 @@ class CurrencyHistoryRateView(APIView):
     """
     API View to asynchronously retrieve currency rates for a particular time range.
     """
-    async def post(self, request):
+    async def post(self, request, *args, **kwargs):
+        version = kwargs.get('version')
         date_from = request.data.get("date_from")
         date_to = request.data.get("date_to")
         source_currency = request.data.get("source_currency")
-        logger.info("Currency Historical Rates requested for {}, from {} to {}".format(
+        logger.info("Currency Historical Rates {} requested for {}, from {} to {}".format(
+            version,
             source_currency,
             date_from,
             date_to
@@ -186,22 +192,26 @@ class CurrencyHistoryRateView(APIView):
                 {"error": "Invalid date range"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        process_id = await batch_process(
-            source_currency=source_currency,
-            valid_currencies=valid_currencies,
-            date_from=date_from_parsed,
-            date_to=date_to_parsed
-        )
-        response_body = {
-            "process_id": str(process_id),
-        }
-        return Response(
-            response_body,
-            status=status.HTTP_200_OK
-        )
+        try:
+            process_id = await batch_process(
+                source_currency=source_currency,
+                valid_currencies=valid_currencies,
+                date_from=date_from_parsed,
+                date_to=date_to_parsed
+            )
+            response_body = {
+                "process_id": str(process_id),
+            }
+            return Response(
+                response_body,
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def Converter(request):
+def Converter(request, *args, **kwargs):
+    version = kwargs.get('version')
     conversion_results = []
     if request.method == 'POST':
         form = CurrencyConverterForm(request.POST)
@@ -210,6 +220,13 @@ def Converter(request):
             source_currency = form.cleaned_data['source_currency']
             exchanged_currencies = form.cleaned_data['exchanged_currency']
             amount = form.cleaned_data['amount']
+
+            logger.info("Converter {} requested for {} to {} with amount of {}".format(
+                version,
+                source_currency,
+                ",".join(exchanged_currencies),
+                amount
+            ))
 
             for exchanged_currency in exchanged_currencies:
                 convertion_rate = get_exchange_convertion(

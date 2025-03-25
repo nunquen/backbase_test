@@ -45,34 +45,35 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
         Raises:
             ValueError: If the API request fails or the response does not contain expected data.
         """
-        headers = {
-            "Authorization": "Bearer {}".format(
-                self.api_key
-            )
-        }
-        params = {
-            "start_date": date_from.strftime("%Y-%m-%d"),
-            "end_date": date_to.strftime("%Y-%m-%d"),
-            "base": source_currency,
-            "symbols": exchanged_currency
-        }
-        endpoint = "{}/timeseries".format(CurrencyBeaconAdapter.BASE_URL)
-        response = requests.get(endpoint, params=params, headers=headers)
+        try:
+            headers = {
+                "Authorization": "Bearer {}".format(
+                    self.api_key
+                )
+            }
+            params = {
+                "start_date": date_from.strftime("%Y-%m-%d"),
+                "end_date": date_to.strftime("%Y-%m-%d"),
+                "base": source_currency,
+                "symbols": exchanged_currency
+            }
+            endpoint = "{}/timeseries".format(CurrencyBeaconAdapter.BASE_URL)
+            response = requests.get(endpoint, params=params, headers=headers)
 
-        if response.status_code != 200:
-            content_str = response.content.decode('utf-8')
-            content = json.loads(content_str)
-            logger.exception(
-                f"API request failed: {response.status_code}: {content['message']}"
-            )
-            raise ValueError(content["message"])  # noqa: E501
+            if response.status_code != 200:
+                msg = json.loads(response.text)["meta"]["error_detail"]
+                error_msg = f"API request failed: {response.status_code} - {msg}"  # noqa: E501
+                logger.error(error_msg)
+                raise ValueError(error_msg)
 
-        data = response.json()
+            data = response.json()
 
-        if "response" in data:
-            return data["response"]
-        else:
-            raise ValueError("Time Series rates not found")
+            if "response" in data:
+                return data["response"]
+            else:
+                raise ValueError("Time Series rates not found")
+        except Exception as e:
+            raise e
 
     def get_exchange_convertion_data(
         self,
@@ -101,6 +102,7 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
             ValueError: If the API request fails or the response does not contain expected data.
         """
         try:
+            error_msg = ""
             headers = {
                 "Authorization": "Bearer {}".format(
                     self.api_key
@@ -115,8 +117,10 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
             response = requests.get(endpoint, params=params, headers=headers)
 
             if response.status_code != 200:
-                logger.error(f"API request failed: {response.status_code} - {response.text}")  # noqa: E501
-                raise ValueError(f"API request failed: {response.status_code} - {response.text}")  # noqa: E501
+                msg = json.loads(response.text)["meta"]["error_detail"]
+                error_msg = f"API request failed: {response.status_code} - {msg}"  # noqa: E501
+                logger.error(error_msg)
+                raise ValueError(error_msg)
 
             data = response.json()
 
@@ -134,4 +138,4 @@ class CurrencyBeaconAdapter(BaseExchangeRateAdapter):
                 raise ValueError("Time Series rates not found")
 
         except Exception as e:
-            ValueError("Time Series rates not found")
+            raise ValueError(e)

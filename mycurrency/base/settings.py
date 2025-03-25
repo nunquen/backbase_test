@@ -30,6 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['testserver', '127.0.0.1']
 
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning'
+}
 
 # Application definition
 

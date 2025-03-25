@@ -3,6 +3,7 @@ import logging
 from asgiref.sync import sync_to_async
 from datetime import date, timedelta
 from django.conf import settings
+from django.utils import timezone
 from typing import List
 from uuid import uuid4
 
@@ -57,41 +58,47 @@ def fetch_remote_data(
     logger.info("Fetching remote data for source_currency {}".format(
         source_currency
     ))
-    data, provider = get_exchange_rate_data(
-        source_currency=source_currency,
-        exchanged_currency=exchanged_currencies,
-        date_from=date_range[0],
-        date_to=date_range[-1]
-    )
-    logger.info("fetch_remote_data using {}: data is {}".format(provider, data))
-    if not data:
-        return
+    try:
+        data, provider = get_exchange_rate_data(
+            source_currency=source_currency,
+            exchanged_currency=exchanged_currencies,
+            date_from=date_range[0],
+            date_to=date_range[-1]
+        )
+        logger.info("fetch_remote_data using {}: data is {}".format(provider, data))
+        if not data:
+            return
 
-    # Saving data in data base
-    for date_rate, currency_data in data.items():
-        for currency, rate in currency_data.items():
-            if rate is None:
-                continue
+        # Saving data in data base
+        for date_rate, currency_data in data.items():
+            for currency, rate in currency_data.items():
+                if rate is None:
+                    continue
 
-            source_currency_obj = Currency.objects.get(code=source_currency)
-            exchanged_obj = Currency.objects.get(code=currency)
+                source_currency_obj = Currency.objects.get(code=source_currency)
+                exchanged_obj = Currency.objects.get(code=currency)
 
-            CurrencyExchangeRate.objects.get_or_create(
-                source_currency=source_currency_obj,
-                exchanged_currency=exchanged_obj,
-                valuation_date=date_rate,
-                defaults={"rate_value": rate},
+                CurrencyExchangeRate.objects.get_or_create(
+                    source_currency=source_currency_obj,
+                    exchanged_currency=exchanged_obj,
+                    valuation_date=date_rate,
+                    defaults={"rate_value": rate},
+                )
+        # Recovering batch process from database and updating counter and status
+        batch_process_instance = BatchProcess.objects.get(
+            process_id=process_id
+        )
+        batch_process_instance.processes_counter += 1
+        if batch_process_instance.processes_counter == batch_process_instance.processes:
+            batch_process_instance.status = BatchProcess.Status.DONE
+            batch_process_instance.ending_time = timezone.now()
+            batch_process_instance.save(
+                update_fields=['processes_counter', 'status', 'ending_time']
             )
-    # Recovering batch process from database and updating counter and status
-    batch_process_instance = BatchProcess.objects.get(
-        process_id=process_id
-    )
-    batch_process_instance.processes_counter += 1
-    if batch_process_instance.processes_counter == batch_process_instance.processes:
-        batch_process_instance.status = BatchProcess.Status.DONE
-        batch_process_instance.save(update_fields=['processes_counter', 'status'])
-    else:
-        batch_process_instance.save(update_fields=['processes_counter'])
+        else:
+            batch_process_instance.save(update_fields=['processes_counter'])
+    except Exception as e:
+        raise e
 
 
 async def batch_process(
@@ -168,16 +175,22 @@ async def batch_process(
         )
         # Iterate over each subset of missing dates
         for subset in missing_rate_dates:
-            # Schedule the fetch_remote_data call as a task
-            async with asyncio.TaskGroup() as task_group:
-                task_group.create_task(asyncio.to_thread(
-                    fetch_remote_data,
-                    source_currency,
-                    exchanged_currencies,
-                    subset,
-                    batch_process_instance.process_id
-                ))
-            # Wait for 0.2 secs before the next task to avoid remote api error
-            await asyncio.sleep(sleep_time)
+            try:
+                # Schedule the fetch_remote_data call as a task
+                async with asyncio.TaskGroup() as task_group:
+                    task_group.create_task(asyncio.to_thread(
+                        fetch_remote_data,
+                        source_currency,
+                        exchanged_currencies,
+                        subset,
+                        batch_process_instance.process_id
+                    ))
+                # Wait for 0.2 secs before the next task to avoid remote api error
+                await asyncio.sleep(sleep_time)
+            except* Exception as eg:
+                # Handle multiple exceptions raised within the TaskGroup
+                logging.error(f"batch_process - An error occurred: {eg.exceptions[0]}")
+                # Optionally, re-raise the exception group if further action is needed
+                raise eg.exceptions[0]
 
     return batch_process_instance.process_id

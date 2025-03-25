@@ -31,9 +31,9 @@ EXPOSE 8000
 ENV PATH="/mycurrency/venv/bin:$PATH"
 
 # Set environment variables for superuser credentials
-ENV DJANGO_SUPERUSER_USERNAME=backbase
-ENV DJANGO_SUPERUSER_EMAIL=saul@backbase.com
-ENV DJANGO_SUPERUSER_PASSWORD=backbase
+ENV DJANGO_SUPERUSER_USERNAME=
+ENV DJANGO_SUPERUSER_EMAIL=
+ENV DJANGO_SUPERUSER_PASSWORD=
 
 # Command to create the superuser and start the server
 # Command to apply migrations, create superuser, and start the server

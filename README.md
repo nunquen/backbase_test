@@ -10,6 +10,13 @@ pip install -r mycurrency/requirements.txt
 ```
 #### Docker installation
 Follow these steps only if you have docker running in your system:
+- Edit mycurrency/Dockerfile and add superuser required information:
+```
+ENV DJANGO_SUPERUSER_USERNAME=
+ENV DJANGO_SUPERUSER_EMAIL=
+ENV DJANGO_SUPERUSER_PASSWORD=
+```
+- Run this commands:
 ```
 cd backbase_test/mycurrency
 docker build -t mycurrency . 
@@ -27,9 +34,9 @@ PYTHONPATH=$(pwd) python mycurrency/manage.py runserver
 
 2. Using the admin page, set the Private key for the CurrencyBacon provider
 - Assuming that MyCurrency app will be running in localhost and using port 8000:
-- Open http://127.0.0.1:8000/admin/ in a browser and connect using the admin user previously created
+-   Open http://127.0.0.1:8000/admin/ in a browser and connect using the admin user previously created
 Note: Docker uses user 'backbase' with the same password
-- Update CurrencyBacon provider: Home > Providers > CurrencyBacon
+-   Update CurrencyBacon provider: Home > Providers > CurrencyBacon
 
 #### MANAGE PROVIDERS
 ```
@@ -37,22 +44,23 @@ You can enable/disable and change provider's priority here:
 http://127.0.0.1:8000/admin/rates/provider/
 ```
 
-#### TEST THE ENDPOINTS
+#### THE ENDPOINTS
 You can use rates/postman_collections/JOBS_BackBase.postman_collection.json and import them using Postman
+- Note: to use BeaconCurrency endpoints, you'll need to add your BeaconCurrency Bearer token first
 
-- CURRENCY RATES
+- CURRENCY RATES: available v1 and v2
 ```
 Method      Endpoint                        Example
 GET         /api/v1/currency-rates/         http://127.0.0.1:8000/api/v1/currency-rates/?source_currency=USD&date_from=2025-01-01&date_to=2025-01-10
 ```
 
-- CURRENCY CONVERTER: 
+- CURRENCY CONVERTER: available v1 and v2
 ```
 Method      Endpoint                        Example
 GET         /api/v1/currency-converter/     http://127.0.0.1:8000/api/v1/currency-converter/?source_currency=USD&exchanged_currency=GBP&amount=1
 ```
 
-- FETCHING MASSIVE HISTORY RATES (concurrency way)
+- FETCHING MASSIVE HISTORY RATES (concurrency way): available for v2 only
 ```
 Method      Endpoint                        Example
 POST        /api/v1/currency-history-rates/ http://127.0.0.1:8000/api/v1/currency-history-rates
@@ -102,7 +110,7 @@ http://127.0.0.1:8000/converter/
 
 ### RUN TESTS
 ```
-Note: run migration before testing
+Note: run migration before testing. Tests must be run locally or in pipelines.
 cd backbase_test
 PYTHONPATH=$(pwd) python -m pytest --disable-warnings -v -s mycurrency/tests/test_*.py
 ```
