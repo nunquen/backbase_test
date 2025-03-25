@@ -84,7 +84,7 @@ Note:
 
 - CURRENCY CRUD:
 ```
-Method      Endpoint                Description
+Method      Endpoint                    Description
 GET         /api/currency-rates/        Retrieve a time serie convertion rate based on date range 
 GET         /api/currency-converter/    Convert a courrency amount
 GET         /api/currency/              List all currencies
@@ -110,6 +110,8 @@ http://127.0.0.1:8000/converter/
 ### RUN TESTS
 ```
 Note: run migration before testing. Tests must be run locally.
+
+PYTHONPATH=$(pwd) python mycurrency/manage.py migrate
 cd backbase_test
 PYTHONPATH=$(pwd) python -m pytest --disable-warnings -v -s mycurrency/tests/test_*.py
 ```
