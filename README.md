@@ -47,13 +47,13 @@ http://127.0.0.1:8000/admin/rates/provider/
 You can use rates/postman_collections/JOBS_BackBase.postman_collection.json and import them using Postman
 - Note: to use BeaconCurrency endpoints, you'll need to add your BeaconCurrency Bearer token first
 
-- CURRENCY RATES: available v1 and v2
+- CURRENCY RATES: available for v1 and v2
 ```
 Method      Endpoint                        Example
 GET         /api/v1/currency-rates/         http://127.0.0.1:8000/api/v1/currency-rates/?source_currency=USD&date_from=2025-01-01&date_to=2025-01-10
 ```
 
-- CURRENCY CONVERTER: available v1 and v2
+- CURRENCY CONVERTER: available for v1 and v2
 ```
 Method      Endpoint                        Example
 GET         /api/v1/currency-converter/     http://127.0.0.1:8000/api/v1/currency-converter/?source_currency=USD&exchanged_currency=GBP&amount=1
